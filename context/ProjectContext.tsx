@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Project } from '../types';
+import { supabase } from '../supabaseClient';
 
 interface ProjectContextType {
     projects: Project[];
@@ -11,91 +12,122 @@ interface ProjectContextType {
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
-const SEED_DATA: Project[] = [
-    {
-        id: '042',
-        title: 'NEURAL_NET_VIZ',
-        category: 'AI',
-        status: 'LIVE',
-        description: 'Real-time data visualization dashboard for tracking ML model training. Utilizes WebGL for rendering large datasets.',
-        techStack: ['D3.js', 'WebGL', 'React'],
-        imageUrl: 'https://picsum.photos/800/450?grayscale',
-        timestamp: new Date().toISOString()
-    },
-    {
-        id: '041',
-        title: 'CYBER_COMMERCE',
-        category: 'WEB',
-        status: 'OFFLINE',
-        description: 'A stripped-back e-commerce experience for a luxury streetwear brand. Focus on typography and negative space.',
-        techStack: ['Shopify', 'Liquid', 'GSAP'],
-        imageUrl: 'https://picsum.photos/800/451?grayscale',
-        timestamp: new Date().toISOString()
-    },
-    {
-        id: '040',
-        title: 'VECTOR_FIELD_09',
-        category: '3D_ART',
-        status: 'LIVE',
-        description: 'Generative art piece exploring vector fields and flow algorithms.',
-        techStack: ['Canvas API', 'TypeScript'],
-        imageUrl: 'https://picsum.photos/800/452?grayscale',
-        timestamp: new Date().toISOString()
-    },
-    {
-        id: '039',
-        title: 'FRAGMENT_ENGINE',
-        category: 'SYSTEM',
-        status: 'ARCHIVED',
-        description: 'Custom game engine prototype built for performance testing.',
-        techStack: ['C++', 'OpenGL', 'WASM'],
-        imageUrl: 'https://picsum.photos/800/453?grayscale',
-        timestamp: new Date().toISOString()
-    }
-];
-
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [projects, setProjects] = useState<Project[]>(() => {
-        const saved = localStorage.getItem('sys_projects');
-        return saved ? JSON.parse(saved) : SEED_DATA;
-    });
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [loading, setLoading] = useState(true);
 
+    const fetchProjects = async () => {
+        try {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('projects')
+                .select('*')
+                .order('timestamp', { ascending: false });
 
-    // Sync state across tabs
-    useEffect(() => {
-        const handleStorageChange = (e: StorageEvent) => {
-            if (e.key === 'sys_projects' && e.newValue) {
-                setProjects(JSON.parse(e.newValue));
+            if (error) {
+                console.error('Error fetching projects:', error);
+                // Fallback to empty or maybe show a notification
+            } else {
+                const mappedProjects: Project[] = data.map((p: any) => ({
+                    id: p.id,
+                    title: p.title,
+                    category: p.category,
+                    status: p.status,
+                    description: p.description,
+                    techStack: p.tech_stack || [],
+                    imageUrl: p.image_url || '',
+                    timestamp: p.timestamp
+                }));
+                setProjects(mappedProjects);
             }
+        } catch (err) {
+            console.error('Unexpected error fetching projects:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProjects();
+
+        const subscription = supabase
+            .channel('public:projects')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
+                fetchProjects();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(subscription);
         };
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
-    useEffect(() => {
-        try {
-            localStorage.setItem('sys_projects', JSON.stringify(projects));
-        } catch (e) {
-            console.error("STORAGE_QUOTA_EXCEEDED", e);
-            alert("SYSTEM_WARNING: STORAGE_CAPACITY_REACHED. ASSETS_MAY_NOT_PERSIST.");
-        }
-    }, [projects]);
-
-    const addProject = (project: Omit<Project, 'id' | 'timestamp'>) => {
-        const newProject: Project = {
-            ...project,
-            id: Math.random().toString(36).substr(2, 9).toUpperCase(),
-            timestamp: new Date().toISOString()
+    const addProject = async (project: Omit<Project, 'id' | 'timestamp'>) => {
+        const dbProject = {
+            title: project.title,
+            category: project.category,
+            status: project.status,
+            description: project.description,
+            tech_stack: project.techStack,
+            image_url: project.imageUrl
         };
-        setProjects(prev => [newProject, ...prev]);
+
+        const { data, error } = await supabase
+            .from('projects')
+            .insert([dbProject])
+            .select();
+
+        if (error) {
+            console.error('Error adding project:', error);
+        } else if (data) {
+            const newProject: Project = {
+                id: data[0].id,
+                title: data[0].title,
+                category: data[0].category,
+                status: data[0].status,
+                description: data[0].description,
+                techStack: data[0].tech_stack || [],
+                imageUrl: data[0].image_url || '',
+                timestamp: data[0].timestamp
+            };
+            setProjects(prev => [newProject, ...prev]);
+        }
     };
 
-    const updateProject = (id: string, updated: Partial<Project>) => {
-        setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updated } : p));
+    const updateProject = async (id: string, updated: Partial<Project>) => {
+        const dbUpdate: any = { ...updated };
+        if (updated.techStack) {
+            dbUpdate.tech_stack = updated.techStack;
+            delete dbUpdate.techStack;
+        }
+        if (updated.imageUrl) {
+            dbUpdate.image_url = updated.imageUrl;
+            delete dbUpdate.imageUrl;
+        }
+
+        const { error } = await supabase
+            .from('projects')
+            .update(dbUpdate)
+            .eq('id', id);
+
+        if (error) {
+            console.error('Error updating project:', error);
+        } else {
+            setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updated } : p));
+        }
     };
 
-    const deleteProject = (id: string) => {
-        setProjects(prev => prev.filter(p => p.id !== id));
+    const deleteProject = async (id: string) => {
+        const { error } = await supabase
+            .from('projects')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            console.error('Error deleting project:', error);
+        } else {
+            setProjects(prev => prev.filter(p => p.id !== id));
+        }
     };
 
     const getProject = (id: string) => projects.find(p => p.id === id);
