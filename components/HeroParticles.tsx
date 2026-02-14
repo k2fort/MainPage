@@ -27,7 +27,7 @@ export const HeroParticles: React.FC = () => {
     let height = 0;
 
     // Configuration
-    const particleCount = 350; // High density
+    const particleCount = 1200; // Maximum density
     const connectionDistance = 100;
     const mouseInteractionDistance = 200;
     const speed = 0.6;
@@ -69,7 +69,7 @@ export const HeroParticles: React.FC = () => {
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
-      
+
       particles.forEach((p, i) => {
         // Update Position
         p.x += p.vx;
@@ -86,21 +86,21 @@ export const HeroParticles: React.FC = () => {
 
         // Repulsion effect from mouse
         if (distMouse < mouseInteractionDistance) {
-            const angle = Math.atan2(dyMouse, dxMouse);
-            const force = (mouseInteractionDistance - distMouse) / mouseInteractionDistance;
-            
-            // Push particles away gently
-            const pushForce = force * 2;
-            p.x -= Math.cos(angle) * pushForce;
-            p.y -= Math.sin(angle) * pushForce;
+          const angle = Math.atan2(dyMouse, dxMouse);
+          const force = (mouseInteractionDistance - distMouse) / mouseInteractionDistance;
 
-            // Draw connection to mouse (Cybernetic tether)
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(${primaryColor}, ${force * 0.4})`;
-            ctx.lineWidth = 1;
-            ctx.moveTo(p.x + p.size/2, p.y + p.size/2);
-            ctx.lineTo(mouseRef.current.x, mouseRef.current.y);
-            ctx.stroke();
+          // Push particles away gently
+          const pushForce = force * 2;
+          p.x -= Math.cos(angle) * pushForce;
+          p.y -= Math.sin(angle) * pushForce;
+
+          // Draw connection to mouse (Cybernetic tether)
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(${primaryColor}, ${force * 0.4})`;
+          ctx.lineWidth = 1;
+          ctx.moveTo(p.x + p.size / 2, p.y + p.size / 2);
+          ctx.lineTo(mouseRef.current.x, mouseRef.current.y);
+          ctx.stroke();
         }
 
         // Draw Particle
@@ -147,9 +147,9 @@ export const HeroParticles: React.FC = () => {
 
   return (
     <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <canvas ref={canvasRef} className="opacity-60" />
+      <canvas ref={canvasRef} className="opacity-80" />
       {/* Vignette overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#050505_90%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(5,5,5,0.3)_100%)]" />
     </div>
   );
 };

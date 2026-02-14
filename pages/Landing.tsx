@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowUpRight, Activity, Terminal, MapPin, Cpu, Layers, Box, Zap, Code } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HeroParticles } from '../components/HeroParticles';
 import { useProjectContext } from '../context/ProjectContext';
+
+const BACKGROUNDS = [
+    '/img/logo01.webp',
+    '/img/logo02.webp',
+    '/img/logo03.webp'
+];
 
 const ProjectCard: React.FC<{
     id: string;
@@ -79,44 +85,68 @@ const ServiceCard: React.FC<{
 
 export const Landing: React.FC = () => {
     const { projects } = useProjectContext();
+    const [bgImage, setBgImage] = useState<string>('');
+
+    useEffect(() => {
+        const randomBg = BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)];
+        setBgImage(randomBg);
+    }, []);
+
     return (
         <>
-            {/* Hero Section */}
-            <section className="relative z-10 min-h-[85vh] flex flex-col justify-center px-6 max-w-[1400px] mx-auto border-l border-r border-muted/30 overflow-hidden">
+            {/* Random Background Video Layer */}
+            {bgImage && (
+                <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                    <img
+                        src={bgImage}
+                        alt="Background Animation"
+                        className="w-full h-full object-cover opacity-40 scale-125 translate-x-24"
+                    />
+                    <div className="absolute inset-0 bg-background-dark/60"></div>
+                </div>
+            )}
 
-                {/* Particle System Layer */}
+            {/* Hero Section */}
+            {/* Hero Section */}
+            <section className="relative z-10 min-h-[85vh] flex flex-col justify-center overflow-hidden">
+
+                {/* Particle System Layer - Full Width */}
                 <HeroParticles />
 
-                <div className="absolute top-1/4 right-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] border border-muted/20 rounded-full animate-[spin_20s_linear_infinite] pointer-events-none opacity-50 flex items-center justify-center z-0">
-                    <div className="w-[70%] h-[70%] border border-muted/20 rotate-45"></div>
-                </div>
+                {/* Constrained Content Container */}
+                <div className="w-full max-w-[1400px] mx-auto px-6 border-l border-r border-muted/30 flex-grow flex flex-col justify-center relative z-10">
 
-                <div className="relative max-w-5xl z-10">
-                    <p className="text-primary text-sm md:text-base mb-2 font-mono tracking-widest pl-1">
-                // IDENTITY_RECONSTRUCTION_COMPLETE
-                    </p>
-                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold tracking-[-0.05em] leading-[0.9] text-white uppercase mix-blend-exclusion">
-                        TONY_<br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600">SMOSH</span>
-                    </h1>
-
-                    <div className="mt-8 flex flex-col md:flex-row gap-6 md:gap-12 items-start md:items-center">
-                        <div className="flex items-center gap-3 bg-surface border border-muted px-4 py-2">
-                            <span className="w-2 h-2 bg-primary animate-blink"></span>
-                            <span className="text-sm text-gray-400 font-mono">STATUS: <span className="text-white">OPERATIONAL</span></span>
-                        </div>
-                        <p className="max-w-md text-gray-400 text-sm md:text-base leading-relaxed font-mono">
-                            Helping founders launch faster, convert better, and automate smarter through premium web design and custom AI workflows.
-                        </p>
+                    <div className="absolute top-1/4 right-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] border border-muted/20 rounded-full animate-[spin_20s_linear_infinite] pointer-events-none opacity-50 flex items-center justify-center z-0">
+                        <div className="w-[70%] h-[70%] border border-muted/20 rotate-45"></div>
                     </div>
 
-                    <div className="mt-12 group">
-                        <button
-                            onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="relative bg-transparent border border-primary text-primary hover:bg-primary hover:text-black px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wider transition-all duration-75 shadow-[4px_4px_0px_0px_#444] hover:shadow-hard"
-                        >
-                            [ Execute_Scroll_Down ]
-                        </button>
+                    <div className="relative max-w-5xl z-10">
+                        <p className="text-primary text-sm md:text-base mb-2 font-mono tracking-widest pl-1">
+                    // IDENTITY_RECONSTRUCTION_COMPLETE
+                        </p>
+                        <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold tracking-[-0.05em] leading-[0.9] text-white uppercase mix-blend-exclusion">
+                            TONY_<br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600">SMOSH</span>
+                        </h1>
+
+                        <div className="mt-8 flex flex-col md:flex-row gap-6 md:gap-12 items-start md:items-center">
+                            <div className="flex items-center gap-3 bg-surface border border-muted px-4 py-2">
+                                <span className="w-2 h-2 bg-primary animate-blink"></span>
+                                <span className="text-sm text-gray-400 font-mono">STATUS: <span className="text-white">OPERATIONAL</span></span>
+                            </div>
+                            <p className="max-w-md text-gray-400 text-sm md:text-base leading-relaxed font-mono">
+                                Helping founders launch faster, convert better, and automate smarter through premium web design and custom AI workflows.
+                            </p>
+                        </div>
+
+                        <div className="mt-12 group">
+                            <button
+                                onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+                                className="relative bg-transparent border border-primary text-primary hover:bg-primary hover:text-black px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wider transition-all duration-75 shadow-[4px_4px_0px_0px_#444] hover:shadow-hard"
+                            >
+                                [ Execute_Scroll_Down ]
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
