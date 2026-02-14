@@ -8,6 +8,7 @@ import { TextReveal } from '../components/TextReveal';
 import { TypewriterText } from '../components/TypewriterText';
 import { ProjectCard } from '../components/ProjectCard';
 import { useInquiryContext } from '../context/InquiryContext';
+import { SecureInput } from '../components/SecureInput';
 
 const BACKGROUNDS = [
     '/img/logo01.webp',
@@ -63,6 +64,12 @@ export const Landing: React.FC = () => {
         "> previous_session_id: x89_aa2",
         "> clearing_cache... done."
     ]);
+    const [isEncrypting, setIsEncrypting] = useState(false);
+    const [formState, setFormState] = useState({ name: '', email: '', message: '' });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormState(prev => ({ ...prev, [e.target.id]: e.target.value }));
+    };
     return (
         <>
             {/* Hero Section */}
@@ -263,79 +270,84 @@ export const Landing: React.FC = () => {
                                 <div className="absolute -top-4 -left-4 w-4 h-4 border-t border-l border-muted"></div>
                                 <div className="absolute -bottom-4 -right-4 w-4 h-4 border-b border-r border-muted"></div>
 
-                                <form className="flex flex-col gap-10 p-2" onSubmit={(e) => {
+                                <form className="flex flex-col gap-10 p-2" onSubmit={async (e) => {
                                     e.preventDefault();
-                                    const form = e.currentTarget;
-                                    const formData = new FormData(form);
+
+                                    setIsEncrypting(true);
+                                    setTerminalLines(["> INITIALIZING_UPLINK..."]);
+
+                                    // Simulate encryption delay
+                                    await new Promise(r => setTimeout(r, 600));
+                                    setTerminalLines(prev => [...prev, "> ENCRYPTING_PAYLOAD..."]);
+                                    await new Promise(r => setTimeout(r, 800));
+                                    setTerminalLines(prev => [...prev, "> UPLOADING_TO_SECURE_SERVER..."]);
+                                    await new Promise(r => setTimeout(r, 600));
 
                                     addInquiry({
-                                        name: formData.get('name') as string,
-                                        email: formData.get('email') as string,
-                                        message: formData.get('message') as string
+                                        name: formState.name,
+                                        email: formState.email,
+                                        message: formState.message
                                     });
 
-                                    setTerminalLines([
-                                        "> TRANSMISSION_INITIATED...",
-                                        "> PACKING_DATA... [OK]",
-                                        "> ESTABLISHING_UPLINK... [OK]",
-                                        "> SENT_TO_HOST_INBOX",
-                                        "> AWAITING_RESPONSE..."
+                                    setTerminalLines(prev => [
+                                        ...prev,
+                                        "> TRANSMISSION_COMPLETE [200 OK]",
+                                        "> CONNECTION_TERMINATED"
                                     ]);
 
-                                    form.reset();
+                                    setIsEncrypting(false);
+                                    setFormState({ name: '', email: '', message: '' });
                                 }}>
                                     <Reveal delay={0.1} width="100%">
-                                        <div className="flex flex-col gap-2 relative group/input">
-                                            <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
-                                                <span>01_SENDER_IDENTITY</span>
-                                                <span className="text-muted group-focus-within/input:text-primary transition-colors">::</span>
-                                            </label>
-                                            <input
-                                                className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase"
-                                                placeholder="ENTER_NAME"
-                                                type="text"
-                                                name="name"
-                                                required
-                                            />
-                                        </div>
+                                        <SecureInput
+                                            id="name"
+                                            label="01_SENDER_IDENTITY"
+                                            placeholder="ENTER_CODENAME"
+                                            value={formState.name}
+                                            onChange={handleInputChange}
+                                            required
+                                            isScrambling={isEncrypting}
+                                        />
                                     </Reveal>
 
                                     <Reveal delay={0.2} width="100%">
-                                        <div className="flex flex-col gap-2 relative group/input">
-                                            <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
-                                                <span>02_RETURN_ADDRESS</span>
-                                                <span className="text-muted group-focus-within/input:text-primary transition-colors">::</span>
-                                            </label>
-                                            <input
-                                                className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase"
-                                                placeholder="ENTER_EMAIL"
-                                                type="email"
-                                                name="email"
-                                                required
-                                            />
-                                        </div>
+                                        <SecureInput
+                                            id="email"
+                                            type="email"
+                                            label="02_RETURN_ADDRESS"
+                                            placeholder="ENTER_SECURE_EMAIL"
+                                            value={formState.email}
+                                            onChange={handleInputChange}
+                                            required
+                                            isScrambling={isEncrypting}
+                                        />
                                     </Reveal>
 
                                     <Reveal delay={0.3} width="100%">
-                                        <div className="flex flex-col gap-2 relative group/input">
-                                            <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
-                                                <span>03_MISSION_BRIEF</span>
-                                                <span className="text-muted group-focus-within/input:text-primary transition-colors">::</span>
-                                            </label>
-                                            <textarea
-                                                className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase resize-none h-32"
-                                                placeholder="DESCRIBE_OBJECTIVE"
-                                                name="message"
-                                                required
-                                            ></textarea>
-                                        </div>
+                                        <SecureInput
+                                            id="message"
+                                            type="textarea"
+                                            label="03_MISSION_BRIEF"
+                                            placeholder="DESCRIBE_OBJECTIVE"
+                                            value={formState.message}
+                                            onChange={handleInputChange}
+                                            required
+                                            isScrambling={isEncrypting}
+                                        />
                                     </Reveal>
 
                                     <Reveal delay={0.4} width="100%">
                                         <div className="pt-8">
-                                            <button className="bg-primary text-black font-bold font-display uppercase text-xl py-4 px-12 tracking-wider transition-all duration-75 shadow-[4px_4px_0px_0px_#fff] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none flex items-center gap-2 group/btn">
-                                                [ INIT_TRANSMISSION ]
-                                                <span className="group-hover/btn:animate-ping w-2 h-2 bg-black rounded-full"></span>
+                                            <button
+                                                disabled={isEncrypting}
+                                                className={`
+                                                    bg-primary text-black font-bold font-display uppercase text-xl py-4 px-12 tracking-wider transition-all duration-300 
+                                                    shadow-[4px_4px_0px_0px_#fff] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none flex items-center gap-2 group/btn
+                                                    ${isEncrypting ? 'opacity-50 cursor-wait' : ''}
+                                                `}
+                                            >
+                                                {isEncrypting ? '[ TRANSMITTING... ]' : '[ INIT_TRANSMISSION ]'}
+                                                <span className={`w-2 h-2 bg-black rounded-full ${isEncrypting ? 'animate-ping' : 'group-hover/btn:animate-ping'}`}></span>
                                             </button>
                                         </div>
                                     </Reveal>

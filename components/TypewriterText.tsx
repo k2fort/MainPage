@@ -13,72 +13,68 @@ export const TypewriterText: React.FC<TypewriterTextProps> = ({
     speed = 30,
     className = ""
 }) => {
-    const [displayedLines, setDisplayedLines] = useState<string[]>(lines.map(() => ''));
-    const [started, setStarted] = useState(false);
+    // Current text being displayed for all lines
+    const [displayedLines, setDisplayedLines] = useState<string[]>([]);
 
-    // Refs to track progress without forcing re-renders on every tick logic
-    const lineIndex = useRef(0);
-    const charIndex = useRef(0);
-    const isTyping = useRef(false);
+    // Track which line/char we are currently typing
+    // We strive to match 'lines' prop content
+    const [currentLineIndex, setCurrentLineIndex] = useState(0);
+    const [currentCharIndex, setCurrentCharIndex] = useState(0);
+
+    // Startup delay phase
+    const [hasStarted, setHasStarted] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            setStarted(true);
+            setHasStarted(true);
         }, delay * 1000);
         return () => clearTimeout(timer);
     }, [delay]);
 
     useEffect(() => {
-        if (!started || isTyping.current) return;
-        isTyping.current = true;
+        if (!hasStarted) return;
 
-        let timeoutId: NodeJS.Timeout;
+        // If we have finished all lines, do nothing
+        if (currentLineIndex >= lines.length) return;
 
-        const type = () => {
-            if (lineIndex.current >= lines.length) {
-                isTyping.current = false;
-                return;
-            }
+        const targetLine = lines[currentLineIndex];
 
-            const currentLine = lines[lineIndex.current];
+        // If current displayed line is fully typed
+        if (currentCharIndex >= targetLine.length) {
+            // Move to next line after a pause
+            const timeout = setTimeout(() => {
+                setCurrentLineIndex(prev => prev + 1);
+                setCurrentCharIndex(0);
+            }, speed * 15);
+            return () => clearTimeout(timeout);
+        }
 
-            if (charIndex.current < currentLine.length) {
-                // Add next character
-                const nextCharIndex = charIndex.current + 1;
-                const nextText = currentLine.substring(0, nextCharIndex);
+        // Type next character
+        const timeout = setTimeout(() => {
+            setCurrentCharIndex(prev => prev + 1);
+        }, speed);
 
-                setDisplayedLines(prev => {
-                    const newLines = [...prev];
-                    newLines[lineIndex.current] = nextText;
-                    return newLines;
-                });
+        return () => clearTimeout(timeout);
+    }, [hasStarted, currentLineIndex, currentCharIndex, lines, speed]);
 
-                charIndex.current = nextCharIndex;
-                timeoutId = setTimeout(type, speed);
-            } else {
-                // End of line, move to next
-                lineIndex.current++;
-                charIndex.current = 0;
-                timeoutId = setTimeout(type, speed * 15); // Pause before next line
-            }
-        };
-
-        type();
-
-        return () => clearTimeout(timeoutId);
-    }, [started, lines, speed]);
-
-    if (!started) return null;
+    // specific effect to sync displayedLines with progress
+    useEffect(() => {
+        // Construct the array of lines to display based on progress
+        const newDisplayedLines = lines.map((line, i) => {
+            if (i < currentLineIndex) return line; // Already fully typed
+            if (i === currentLineIndex) return line.substring(0, currentCharIndex); // Currently typing
+            return ''; // Not yet started
+        });
+        setDisplayedLines(newDisplayedLines);
+    }, [currentLineIndex, currentCharIndex, lines]);
 
     return (
         <div className={`font-mono ${className}`}>
             {displayedLines.map((line, i) => (
                 <div key={i} className="min-h-[1.5em] break-words">
-                    {/* Only render line if it has content or if we want to preserve space. 
-                        Since we initialize as empty strings, checking index < lineIndex.current + 1 ensures we only show what we've touched
-                    */}
-                    {i <= lineIndex.current && (
-                        <span>{line}</span>
+                    <span>{line}</span>
+                    {i === currentLineIndex && i < lines.length && (
+                        <span className="animate-pulse inline-block w-2 h-4 bg-primary/50 ml-1 align-middle"></span>
                     )}
                 </div>
             ))}
