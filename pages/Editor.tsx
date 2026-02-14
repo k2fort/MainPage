@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { X, Save, Upload, Terminal } from 'lucide-react';
 import { useProjectContext } from '../context/ProjectContext';
 import { Project } from '../types';
+import { supabase } from '../supabaseClient';
 
 export const Editor: React.FC = () => {
     const navigate = useNavigate();
@@ -228,25 +229,34 @@ export const Editor: React.FC = () => {
                                     onChange={async (e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
-                                            const formData = new FormData();
-                                            formData.append('image', file);
+                                            // Demo Mode Check
+                                            if (!supabase) {
+                                                alert('DEMO_MODE: Cannot upload images without Supabase connection. Please configure environment variables.');
+                                                return;
+                                            }
 
                                             try {
-                                                const response = await fetch('/api/upload', {
-                                                    method: 'POST',
-                                                    body: formData
-                                                });
-                                                const data = await response.json();
+                                                const fileExt = file.name.split('.').pop();
+                                                const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                                                const filePath = `${fileName}`;
 
-                                                if (data.success) {
-                                                    setFormData(prev => ({ ...prev, imageUrl: data.url }));
-                                                } else {
-                                                    console.error('Upload failed:', data.error);
-                                                    alert('UPLOAD_FAILED: ' + data.error);
+                                                const { error: uploadError } = await supabase.storage
+                                                    .from('project-images')
+                                                    .upload(filePath, file);
+
+                                                if (uploadError) {
+                                                    throw uploadError;
                                                 }
-                                            } catch (error) {
+
+                                                const { data: { publicUrl } } = supabase.storage
+                                                    .from('project-images')
+                                                    .getPublicUrl(filePath);
+
+                                                setFormData(prev => ({ ...prev, imageUrl: publicUrl }));
+
+                                            } catch (error: any) {
                                                 console.error('Upload error:', error);
-                                                alert('SYSTEM_ERROR: FAILED_TO_CONNECT_TO_UPLOAD_SERVER');
+                                                alert(`UPLOAD_FAILED: ${error.message || 'Unknown error'}`);
                                             }
                                         }
                                     }}
