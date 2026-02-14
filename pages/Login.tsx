@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Lock, AlertTriangle, Terminal, Activity, Eye, EyeOff } from 'lucide-react';
 import { Reveal } from '../components/Reveal';
+import { supabase } from '../supabaseClient';
 
 export const Login: React.FC = () => {
     const [id, setId] = useState('');
@@ -11,22 +12,37 @@ export const Login: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(false);
 
-        // Mock authentication delay
-        setTimeout(() => {
-            if (id === 'ckrit.net@gmail.com' && key === '1qw2!QW@') {
+        if (!supabase) {
+            console.error('Supabase client not initialized');
+            setError(true);
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: id,
+                password: key,
+            });
+
+            if (error) throw error;
+
+            if (data.session) {
                 localStorage.setItem('sys_access', 'true');
                 navigate('/dashboard');
-            } else {
-                setError(true);
-                setLoading(false);
-                setKey('');
             }
-        }, 1500);
+        } catch (err) {
+            console.error('Login failed:', err);
+            setError(true);
+            setKey('');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

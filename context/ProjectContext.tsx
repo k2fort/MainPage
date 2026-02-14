@@ -4,11 +4,11 @@ import { supabase } from '../supabaseClient';
 
 interface ProjectContextType {
     projects: Project[];
-    addProject: (project: Omit<Project, 'id' | 'timestamp' | 'order'>) => void; // Updated Omit to include 'order'
-    updateProject: (id: string, project: Partial<Project>) => void;
-    deleteProject: (id: string) => void;
+    addProject: (project: Omit<Project, 'id' | 'timestamp' | 'order'>) => Promise<void>;
+    updateProject: (id: string, project: Partial<Project>) => Promise<void>;
+    deleteProject: (id: string) => Promise<void>;
     getProject: (id: string) => Project | undefined;
-    moveProject: (id: string, direction: 'up' | 'down') => void;
+    moveProject: (id: string, direction: 'up' | 'down') => Promise<void>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -177,6 +177,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
         if (error) {
             console.error('Error adding project:', error);
+            throw new Error(error.message);
         } else if (data) {
             const newProject: Project = {
                 id: data[0].id,
@@ -217,6 +218,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
         if (error) {
             console.error('Error updating project:', error);
+            throw new Error(error.message);
         } else {
             setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updated } : p));
         }
@@ -234,6 +236,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
         if (error) {
             console.error('Error deleting project:', error);
+            throw new Error(error.message);
         } else {
             setProjects(prev => prev.filter(p => p.id !== id));
         }

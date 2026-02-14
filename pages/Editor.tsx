@@ -38,8 +38,9 @@ export const Editor: React.FC = () => {
         }
     }, [id, getProject]);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         let finalImage = formData.imageUrl;
+        let finalClientId = formData.clientId;
 
         // Auto-generation safeguard:
         // If image is missing in form, try to preserve stored image (if editing)
@@ -56,18 +57,30 @@ export const Editor: React.FC = () => {
             }
         }
 
+        // Ensure Unique System ID if generic
+        if (!finalClientId || finalClientId === 'AUTO_GEN_ID' || finalClientId === 'AUTO_GEN') {
+            finalClientId = `SYS_${Math.floor(Math.random() * 99999).toString().padStart(5, '0')}`;
+        }
+
         const projectData = {
             ...formData,
+            clientId: finalClientId,
             techStack,
             imageUrl: finalImage
         } as Project;
 
-        if (id) {
-            updateProject(id, projectData);
-        } else {
-            addProject(projectData);
+        try {
+            if (id) {
+                await updateProject(id, projectData);
+            } else {
+                await addProject(projectData);
+            }
+            navigate('/projects');
+        } catch (error) {
+            console.error("Failed to save project:", error);
+            // Optionally alert user here
+            alert("Failed to save project. Check console for details.");
         }
-        navigate('/projects');
     };
 
     const addTag = () => {
