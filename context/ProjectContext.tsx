@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Project } from '../types';
 import { supabase } from '../supabaseClient';
 
@@ -15,8 +15,18 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
+    const warnedSupabaseNull = useRef(false);
 
     const fetchProjects = async () => {
+        if (!supabase) {
+            if (!warnedSupabaseNull.current) {
+                console.warn('Supabase client is not initialized. Check your environment variables.');
+                warnedSupabaseNull.current = true;
+            }
+            setLoading(false);
+            return;
+        }
+
         try {
             setLoading(true);
             const { data, error } = await supabase
@@ -50,6 +60,8 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     useEffect(() => {
         fetchProjects();
 
+        if (!supabase) return;
+
         const subscription = supabase
             .channel('public:projects')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
@@ -63,6 +75,10 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }, []);
 
     const addProject = async (project: Omit<Project, 'id' | 'timestamp'>) => {
+        if (!supabase) {
+            console.error('Supabase not initialized');
+            return;
+        }
         const dbProject = {
             title: project.title,
             category: project.category,
@@ -95,6 +111,8 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
 
     const updateProject = async (id: string, updated: Partial<Project>) => {
+        if (!supabase) return;
+
         const dbUpdate: any = { ...updated };
         if (updated.techStack) {
             dbUpdate.tech_stack = updated.techStack;
@@ -118,6 +136,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
 
     const deleteProject = async (id: string) => {
+        if (!supabase) return;
         const { error } = await supabase
             .from('projects')
             .delete()
