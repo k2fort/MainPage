@@ -1,26 +1,10 @@
 import React, { useMemo } from 'react';
-import { AreaChart, Area, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { AreaChart, Area, ResponsiveContainer, BarChart, Bar, Cell, Tooltip, XAxis } from 'recharts';
 import { Eye, Clock, Cpu, Shield, Globe, Terminal as TerminalIcon, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProjectContext } from '../context/ProjectContext';
+import { useAnalytics } from '../context/AnalyticsContext';
 import { Reveal } from '../components/Reveal';
-
-const demoChartData = [
-    { name: 'A', value: 400 },
-    { name: 'B', value: 300 },
-    { name: 'C', value: 200 },
-    { name: 'D', value: 278 },
-    { name: 'E', value: 189 },
-    { name: 'F', value: 239 },
-    { name: 'G', value: 349 },
-];
-
-const barData = [
-    { name: '01', value: 20 }, { name: '02', value: 40 }, { name: '03', value: 60 },
-    { name: '04', value: 30 }, { name: '05', value: 80 }, { name: '06', value: 50 },
-    { name: '07', value: 70 }, { name: '08', value: 90 }, { name: '09', value: 60 },
-    { name: '10', value: 40 }, { name: '11', value: 75 }, { name: '12', value: 55 },
-];
 
 const StatCard: React.FC<{
     label: string;
@@ -52,14 +36,13 @@ const StatCard: React.FC<{
 
 export const Dashboard: React.FC = () => {
     const { projects } = useProjectContext();
+    const { stats: analyticsStats } = useAnalytics();
 
-    const stats = useMemo(() => {
+    const projectStats = useMemo(() => {
         const total = projects.length;
-        const live = projects.filter(p => p.status === 'LIVE').length;
+        const live = projects.filter(p => p.category === 'LIVE').length;
         const categories = new Set(projects.map(p => p.category)).size;
 
-        // Calculate "uptime" or similar metric based on recent activity if desired, 
-        // for now we'll stick to static helpful text or simple math
         return {
             total,
             live,
@@ -67,6 +50,11 @@ export const Dashboard: React.FC = () => {
             offline: total - live
         };
     }, [projects]);
+
+    // Format top pages for chart
+    const topPagesData = analyticsStats.topPages.length > 0
+        ? analyticsStats.topPages
+        : [{ name: 'NO_DATA', value: 0 }];
 
     return (
         <div className="p-6 lg:p-10 max-w-[1600px] mx-auto flex flex-col gap-8">
@@ -95,9 +83,9 @@ export const Dashboard: React.FC = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Reveal delay={0.1} width="100%">
-                    <StatCard label="Total_Projects" value={stats.total} sub="▲ 12.5% INCREMENT" icon={<TerminalIcon className="text-primary" />}>
+                    <StatCard label="Total_Impressions" value={analyticsStats.totalViews} sub="LIVE_TRAFFIC" icon={<Eye className="text-primary" />}>
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={demoChartData}>
+                            <AreaChart data={topPagesData.length > 3 ? topPagesData : [{ name: '-', value: 10 }, { name: '-', value: 20 }, { name: '-', value: 15 }]}>
                                 <Area type="monotone" dataKey="value" stroke="#00FFFF" fill="none" strokeWidth={2} />
                             </AreaChart>
                         </ResponsiveContainer>
@@ -105,17 +93,17 @@ export const Dashboard: React.FC = () => {
                 </Reveal>
 
                 <Reveal delay={0.2} width="100%">
-                    <StatCard label="Live_Deployments" value={stats.live} sub="SYSTEM_OPTIMAL" icon={<Globe className="text-primary" />}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={barData.slice(0, 5)}>
-                                <Bar dataKey="value" fill="#444" />
-                            </BarChart>
-                        </ResponsiveContainer>
+                    <StatCard label="Unique_Visitors" value={analyticsStats.uniqueVisitors} sub="SESSION_TRACKING" icon={<Globe className="text-primary" />}>
+                        <div className="flex items-end h-full w-full gap-1">
+                            <div className="w-full bg-primary/20 h-2/3 relative overflow-hidden">
+                                <div className="absolute bottom-0 left-0 w-full bg-primary animate-pulse" style={{ height: '40%' }}></div>
+                            </div>
+                        </div>
                     </StatCard>
                 </Reveal>
 
                 <Reveal delay={0.3} width="100%">
-                    <StatCard label="Active_Categories" value={stats.categories} sub="DIVERSE_STACK" icon={<Cpu className="text-primary" />} color="#FF003C">
+                    <StatCard label="Active_Projects" value={projectStats.live} sub={`TOTAL_DB: ${projectStats.total}`} icon={<TerminalIcon className="text-primary" />} color="#FF003C">
                         <div className="flex gap-1 h-full items-end">
                             {[40, 60, 30, 80, 50].map((h, i) => (
                                 <div key={i} style={{ height: `${h}%` }} className="w-2 bg-primary/80"></div>
@@ -156,15 +144,14 @@ export const Dashboard: React.FC = () => {
                                         <tr className="border-b border-muted text-xs uppercase text-gray-500">
                                             <th className="p-4 font-normal border-r border-muted w-16">ID</th>
                                             <th className="p-4 font-normal border-r border-muted">PROJECT_ENTITY</th>
-                                            <th className="p-4 font-normal border-r border-muted w-32">PROTOCOL</th>
-                                            <th className="p-4 font-normal border-r border-muted w-24">STATUS</th>
+                                            <th className="p-4 font-normal border-r border-muted w-32">CATEGORY</th>
                                             <th className="p-4 font-normal text-right w-32">ACTIONS</th>
                                         </tr>
                                     </thead>
                                     <tbody className="text-gray-300">
                                         {projects.slice(0, 5).map((row) => (
                                             <tr key={row.id} className="border-b border-muted hover:bg-white/5 transition-colors group">
-                                                <td className="p-4 border-r border-muted text-gray-500">{row.id.substring(0, 4)}...</td>
+                                                <td className="p-4 border-r border-muted text-gray-500">{row.clientId || '---'}</td>
                                                 <td className="p-4 border-r border-muted font-bold text-white group-hover:text-primary transition-colors">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-4 h-4 bg-muted border border-gray-600"></div>
@@ -172,7 +159,6 @@ export const Dashboard: React.FC = () => {
                                                     </div>
                                                 </td>
                                                 <td className="p-4 border-r border-muted text-xs">{row.category}</td>
-                                                <td className={`p-4 border-r border-muted font-bold text-xs ${row.status === 'LIVE' ? 'text-primary' : row.status === 'ERROR' ? 'text-accent' : 'text-yellow-500'}`}>[ {row.status} ]</td>
                                                 <td className="p-4 text-right">
                                                     <Link to={`/editor/${row.id}`} className="text-xs underline hover:text-primary hover:no-underline mr-2">EDIT</Link>
                                                 </td>
@@ -184,21 +170,27 @@ export const Dashboard: React.FC = () => {
                         </div>
                     </Reveal>
 
-                    {/* Visual Filler Charts */}
+                    {/* Visual Charts */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="border border-muted bg-surface p-4 flex flex-col gap-2 h-48">
-                            <h4 className="font-bold text-xs text-gray-400 uppercase mb-2">SERVER_LOAD_DISTRIBUTION</h4>
+                        <div className="border border-muted bg-surface p-4 flex flex-col gap-2 h-64">
+                            <h4 className="font-bold text-xs text-gray-400 uppercase mb-2">TRAFFIC_BY_ROUTE</h4>
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={barData}>
-                                    <Bar dataKey="value">
-                                        {barData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={index > 8 ? '#00FFFF' : '#444444'} />
+                                <BarChart data={topPagesData} layout="vertical">
+                                    <XAxis type="number" hide />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#111', borderColor: '#333' }}
+                                        itemStyle={{ color: '#fff' }}
+                                        cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                    />
+                                    <Bar dataKey="value" barSize={20}>
+                                        {topPagesData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={index === 0 ? '#00FFFF' : '#444444'} />
                                         ))}
                                     </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="border border-muted bg-surface p-4 flex flex-col gap-2 h-48 justify-between">
+                        <div className="border border-muted bg-surface p-4 flex flex-col gap-2 h-64 justify-between">
                             <h4 className="font-bold text-xs text-gray-400 uppercase mb-2">DATABASE_INTEGRITY</h4>
                             <div className="space-y-4">
                                 {[
@@ -241,7 +233,7 @@ export const Dashboard: React.FC = () => {
                             <div className="absolute bottom-1/3 right-1/3 w-2 h-2 bg-primary animate-ping delay-75"></div>
 
                             <div className="absolute bottom-2 left-2 text-[10px] font-mono text-primary bg-black/50 px-1 border border-primary/20">
-                                ACT_USERS: 142
+                                ACT_USERS: {analyticsStats.uniqueVisitors}
                             </div>
                         </div>
                     </div>
@@ -255,12 +247,17 @@ export const Dashboard: React.FC = () => {
                             </h3>
                             <span className="text-[10px]">[ AUTO_SCROLL: ON ]</span>
                         </div>
-                        <div className="flex-1 p-4 font-mono text-xs overflow-y-auto text-gray-400 space-y-1 relative h-64">
-                            <p><span className="text-gray-600">[{new Date().toLocaleTimeString()}]</span> INIT_SEQUENCE_START...</p>
-                            <p><span className="text-gray-600">[{new Date().toLocaleTimeString()}]</span> LOADING_MODULES: <span className="text-primary">SUCCESS</span></p>
-                            <p><span className="text-gray-600">[{new Date(Date.now() + 1000).toLocaleTimeString()}]</span> CHECKING_INTEGRITY... <span className="text-primary">100%</span></p>
-                            <p><span className="text-gray-600">[{new Date(Date.now() + 2000).toLocaleTimeString()}]</span> SYSTEM_READY</p>
-                            <p className="animate-pulse text-primary mt-2">&gt;_ AWAITING_INPUT</p>
+                        <div className="flex-1 p-4 font-mono text-xs overflow-y-auto text-gray-400 space-y-2 relative h-64">
+                            {analyticsStats.recentLogs.length === 0 ? (
+                                <p className="animate-pulse text-primary mt-2">&gt;_ AWAITING_INPUT...</p>
+                            ) : (
+                                analyticsStats.recentLogs.map((log) => (
+                                    <p key={log.id}>
+                                        <span className="text-gray-600">[{new Date(log.created_at).toLocaleTimeString()}]</span>
+                                        {' '}ACCESS request to: <span className="text-primary">{log.page_path}</span>
+                                    </p>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>

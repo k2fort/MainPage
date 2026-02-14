@@ -52,46 +52,49 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 import { ProjectProvider } from './context/ProjectContext';
 import { InquiryProvider } from './context/InquiryContext';
+import { AnalyticsProvider } from './context/AnalyticsContext';
 
 const App: React.FC = () => {
   return (
     <ProjectProvider>
       <InquiryProvider>
         <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/login" element={<Login />} />
+          <AnalyticsProvider>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/login" element={<Login />} />
 
-              {/* Protected Routes */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/projects" element={
-                <ProtectedRoute>
-                  <Projects />
-                </ProtectedRoute>
-              } />
-              <Route path="/editor/:id" element={
-                <ProtectedRoute>
-                  <Editor />
-                </ProtectedRoute>
-              } />
-              <Route path="/editor" element={
-                <ProtectedRoute>
-                  <Editor />
-                </ProtectedRoute>
-              } />
-              <Route path="/inbox" element={
-                <ProtectedRoute>
-                  <InquiryInbox />
-                </ProtectedRoute>
-              } />
-            </Routes>
-          </Layout>
+                {/* Protected Routes */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/projects" element={
+                  <ProtectedRoute>
+                    <Projects />
+                  </ProtectedRoute>
+                } />
+                <Route path="/editor/:id" element={
+                  <ProtectedRoute>
+                    <Editor />
+                  </ProtectedRoute>
+                } />
+                <Route path="/editor" element={
+                  <ProtectedRoute>
+                    <Editor />
+                  </ProtectedRoute>
+                } />
+                <Route path="/inbox" element={
+                  <ProtectedRoute>
+                    <InquiryInbox />
+                  </ProtectedRoute>
+                } />
+              </Routes>
+            </Layout>
+          </AnalyticsProvider>
         </Router>
       </InquiryProvider>
     </ProjectProvider>
