@@ -13,16 +13,61 @@ interface ProjectContextType {
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [projects, setProjects] = useState<Project[]>([]);
+    const DEMO_PROJECTS: Project[] = [
+        {
+            id: '1',
+            title: 'NEURAL_NET_VIZ',
+            category: 'AI',
+            status: 'LIVE',
+            description: 'Real-time visualization of neural network activation patterns using WebGL & Three.js.',
+            techStack: ['React', 'Three.js', 'TensorFlow.js', 'WebGL'],
+            imageUrl: 'https://images.unsplash.com/photo-1558494949-ef526b0042a0?w=800&q=80',
+            timestamp: new Date().toISOString()
+        },
+        {
+            id: '2',
+            title: 'CYBER_COMMERCE',
+            category: 'WEB',
+            status: 'LIVE',
+            description: 'High-performance headless e-commerce platform built for extreme loads and conversion.',
+            techStack: ['Next.js', 'Shopify', 'Tailwind', 'Redis'],
+            imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80',
+            timestamp: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+            id: '3',
+            title: 'VECTOR_FIELD_09',
+            category: '3D_ART',
+            status: 'DRAFT',
+            description: 'Experimental generative art piece exploring vector fields and particle systems.',
+            techStack: ['Processing', 'P5.js', 'GLSL'],
+            imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80',
+            timestamp: new Date(Date.now() - 172800000).toISOString()
+        },
+        {
+            id: '4',
+            title: 'FRAGMENT_ENGINE',
+            category: 'SYSTEM',
+            status: 'OFFLINE',
+            description: 'Custom game engine architecture for handling massive entity counts in browser.',
+            techStack: ['Rust', 'WASM', 'WebGPU'],
+            imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
+            timestamp: new Date(Date.now() - 259200000).toISOString()
+        }
+    ];
+
+    const [projects, setProjects] = useState<Project[]>(DEMO_PROJECTS);
     const [loading, setLoading] = useState(true);
     const warnedSupabaseNull = useRef(false);
 
     const fetchProjects = async () => {
         if (!supabase) {
             if (!warnedSupabaseNull.current) {
-                console.warn('Supabase client is not initialized. Check your environment variables.');
+                console.warn('Supabase client is not initialized. Using demo data.');
                 warnedSupabaseNull.current = true;
             }
+            // Ensure we have demo data if Supabase is missing
+            setProjects(DEMO_PROJECTS);
             setLoading(false);
             return;
         }
@@ -36,8 +81,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
             if (error) {
                 console.error('Error fetching projects:', error);
-                // Fallback to empty or maybe show a notification
-            } else {
+                // Fallback to demo data on error
+                setProjects(DEMO_PROJECTS);
+            } else if (data && data.length > 0) {
                 const mappedProjects: Project[] = data.map((p: any) => ({
                     id: p.id,
                     title: p.title,
@@ -49,9 +95,18 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     timestamp: p.timestamp
                 }));
                 setProjects(mappedProjects);
+            } else {
+                // If fetches succeed but empty, implies empty DB. 
+                // We can show empty list OR demo data. 
+                // Let's show empty list if DB is connected but empty, 
+                // BUT since user just connected, it might be confusing.
+                // let's stick to empty list if DB is connected + empty, 
+                // so they know their data is live.
+                setProjects([]);
             }
         } catch (err) {
             console.error('Unexpected error fetching projects:', err);
+            setProjects(DEMO_PROJECTS);
         } finally {
             setLoading(false);
         }
