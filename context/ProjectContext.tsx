@@ -92,6 +92,8 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     description: p.description,
                     techStack: p.tech_stack || [],
                     imageUrl: p.image_url || '',
+                    clientId: p.client_id || 'AUTO_GEN',
+                    role: p.role || 'DEV',
                     timestamp: p.timestamp
                 }));
                 setProjects(mappedProjects);
@@ -140,7 +142,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
             status: project.status,
             description: project.description,
             tech_stack: project.techStack,
-            image_url: project.imageUrl
+            image_url: project.imageUrl,
+            client_id: project.clientId || 'AUTO_GEN',
+            role: project.role || 'DEV'
         };
 
         const { data, error } = await supabase
@@ -168,15 +172,16 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const updateProject = async (id: string, updated: Partial<Project>) => {
         if (!supabase) return;
 
-        const dbUpdate: any = { ...updated };
-        if (updated.techStack) {
-            dbUpdate.tech_stack = updated.techStack;
-            delete dbUpdate.techStack;
-        }
-        if (updated.imageUrl) {
-            dbUpdate.image_url = updated.imageUrl;
-            delete dbUpdate.imageUrl;
-        }
+        // Map camelCase to snake_case for DB
+        const dbUpdate: any = {};
+        if (updated.title !== undefined) dbUpdate.title = updated.title;
+        if (updated.category !== undefined) dbUpdate.category = updated.category;
+        if (updated.status !== undefined) dbUpdate.status = updated.status;
+        if (updated.description !== undefined) dbUpdate.description = updated.description;
+        if (updated.techStack !== undefined) dbUpdate.tech_stack = updated.techStack;
+        if (updated.imageUrl !== undefined) dbUpdate.image_url = updated.imageUrl;
+        if (updated.clientId !== undefined) dbUpdate.client_id = updated.clientId;
+        if (updated.role !== undefined) dbUpdate.role = updated.role;
 
         const { error } = await supabase
             .from('projects')
