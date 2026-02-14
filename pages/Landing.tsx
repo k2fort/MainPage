@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ArrowUpRight, Activity, Terminal, MapPin, Cpu, Layers, Box, Zap, Code } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HeroParticles } from '../components/HeroParticles';
@@ -6,15 +6,14 @@ import { useProjectContext } from '../context/ProjectContext';
 import { Reveal } from '../components/Reveal';
 import { TextReveal } from '../components/TextReveal';
 import { TypewriterText } from '../components/TypewriterText';
-import { ProjectCard } from '../components/ProjectCard'; // Assuming ProjectCard is now an external component
+import { ProjectCard } from '../components/ProjectCard';
+import { useInquiryContext } from '../context/InquiryContext';
 
 const BACKGROUNDS = [
     '/img/logo01.webp',
     '/img/logo02.webp',
     '/img/logo03.webp'
 ];
-
-// ProjectCard component definition removed as it's now imported from '../components/ProjectCard'
 
 const ServiceCard: React.FC<{
     icon: React.ReactNode;
@@ -55,6 +54,15 @@ const ServiceCard: React.FC<{
 
 export const Landing: React.FC = () => {
     const { projects } = useProjectContext();
+    const { addInquiry } = useInquiryContext();
+    const [terminalLines, setTerminalLines] = useState([
+        "> SYSTEM_READY",
+        "> MOUNTING_DRIVE... [OK]",
+        "> SCANNING_PORTS... [OK]",
+        "> WAITING_FOR_INPUT_",
+        "> previous_session_id: x89_aa2",
+        "> clearing_cache... done."
+    ]);
     return (
         <>
             {/* Hero Section */}
@@ -137,7 +145,7 @@ export const Landing: React.FC = () => {
                     </h2>
                     <div className="md:block text-right font-mono text-xs">
                         <p className="text-primary mb-1">INDEXING: {projects.length < 10 ? `0${projects.length}` : projects.length} FILES</p>
-                        <p className="text-gray-500">SORT: CHRONOLOGICAL</p>
+                        <p className="text-gray-500">SORT: MANUAL_OVERRIDE</p>
                     </div>
                 </div>
 
@@ -257,7 +265,24 @@ export const Landing: React.FC = () => {
 
                                 <form className="flex flex-col gap-10 p-2" onSubmit={(e) => {
                                     e.preventDefault();
-                                    alert('// TRANSMISSION_INITIATED\n// PACKET_SENT_TO_HOST');
+                                    const form = e.currentTarget;
+                                    const formData = new FormData(form);
+
+                                    addInquiry({
+                                        name: formData.get('name') as string,
+                                        email: formData.get('email') as string,
+                                        message: formData.get('message') as string
+                                    });
+
+                                    setTerminalLines([
+                                        "> TRANSMISSION_INITIATED...",
+                                        "> PACKING_DATA... [OK]",
+                                        "> ESTABLISHING_UPLINK... [OK]",
+                                        "> SENT_TO_HOST_INBOX",
+                                        "> AWAITING_RESPONSE..."
+                                    ]);
+
+                                    form.reset();
                                 }}>
                                     <Reveal delay={0.1} width="100%">
                                         <div className="flex flex-col gap-2 relative group/input">
@@ -269,6 +294,8 @@ export const Landing: React.FC = () => {
                                                 className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase"
                                                 placeholder="ENTER_NAME"
                                                 type="text"
+                                                name="name"
+                                                required
                                             />
                                         </div>
                                     </Reveal>
@@ -283,6 +310,8 @@ export const Landing: React.FC = () => {
                                                 className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase"
                                                 placeholder="ENTER_EMAIL"
                                                 type="email"
+                                                name="email"
+                                                required
                                             />
                                         </div>
                                     </Reveal>
@@ -296,6 +325,8 @@ export const Landing: React.FC = () => {
                                             <textarea
                                                 className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase resize-none h-32"
                                                 placeholder="DESCRIBE_OBJECTIVE"
+                                                name="message"
+                                                required
                                             ></textarea>
                                         </div>
                                     </Reveal>
@@ -309,7 +340,9 @@ export const Landing: React.FC = () => {
                                         </div>
                                     </Reveal>
 
-
+                                    <div className="mt-8 min-h-[140px]">
+                                        {/* Spacer to keep layout stable if needed, or remove completely */}
+                                    </div>
                                 </form>
                             </div>
 
@@ -332,14 +365,8 @@ export const Landing: React.FC = () => {
                                     <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
                                     <div className="flex flex-col gap-1 text-[#888]">
                                         <TypewriterText
-                                            lines={[
-                                                "> SYSTEM_READY",
-                                                "> MOUNTING_DRIVE... [OK]",
-                                                "> SCANNING_PORTS... [OK]",
-                                                "> WAITING_FOR_INPUT_",
-                                                "> previous_session_id: x89_aa2",
-                                                "> clearing_cache... done."
-                                            ]}
+                                            key={terminalLines[0]} // Force re-render on new lines
+                                            lines={terminalLines}
                                             delay={1.0}
                                             speed={30}
                                             className="text-[#888]"

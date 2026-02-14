@@ -6,6 +6,7 @@ import { Projects } from './pages/Projects';
 import { Editor } from './pages/Editor';
 import { Contact } from './pages/Contact';
 import { Login } from './pages/Login';
+import { InquiryInbox } from './pages/InquiryInbox';
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
 import { OverlayEffects } from './components/OverlayEffects';
@@ -18,7 +19,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
-  const isAdmin = ['/dashboard', '/projects', '/editor'].some(path => location.pathname.startsWith(path));
+  const isAdmin = ['/dashboard', '/projects', '/editor', '/inbox'].some(path => location.pathname.startsWith(path));
   const isLogin = location.pathname === '/login';
 
   return (
@@ -50,41 +51,49 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 import { ProjectProvider } from './context/ProjectContext';
+import { InquiryProvider } from './context/InquiryContext';
 
 const App: React.FC = () => {
   return (
     <ProjectProvider>
-      <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/login" element={<Login />} />
+      <InquiryProvider>
+        <Router>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/login" element={<Login />} />
 
-            {/* Protected Routes */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/projects" element={
-              <ProtectedRoute>
-                <Projects />
-              </ProtectedRoute>
-            } />
-            <Route path="/editor/:id" element={
-              <ProtectedRoute>
-                <Editor />
-              </ProtectedRoute>
-            } />
-            <Route path="/editor" element={
-              <ProtectedRoute>
-                <Editor />
-              </ProtectedRoute>
-            } />
-          </Routes>
-        </Layout>
-      </Router>
+              {/* Protected Routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/projects" element={
+                <ProtectedRoute>
+                  <Projects />
+                </ProtectedRoute>
+              } />
+              <Route path="/editor/:id" element={
+                <ProtectedRoute>
+                  <Editor />
+                </ProtectedRoute>
+              } />
+              <Route path="/editor" element={
+                <ProtectedRoute>
+                  <Editor />
+                </ProtectedRoute>
+              } />
+              <Route path="/inbox" element={
+                <ProtectedRoute>
+                  <InquiryInbox />
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </Layout>
+        </Router>
+      </InquiryProvider>
     </ProjectProvider>
   );
 };

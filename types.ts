@@ -1,14 +1,14 @@
 export interface Project {
   id: string;
   title: string;
-  category: 'WEB' | 'AI' | '3D_ART' | 'SYSTEM';
-  status: 'LIVE' | 'OFFLINE' | 'ARCHIVED' | 'ERROR' | 'DRAFT';
+  category: 'LIVE' | 'TEMPLATE';
   description: string;
   techStack: string[];
   imageUrl: string;
   clientId?: string;
   role?: string;
   timestamp?: string;
+  order?: number;
 }
 
 export interface StatMetric {

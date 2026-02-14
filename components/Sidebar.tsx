@@ -50,10 +50,13 @@ export const Sidebar: React.FC = () => {
             <span className="text-sm font-bold tracking-tight hidden lg:block">[ PROJECTS ]</span>
           </Link>
 
-          <div className="group flex items-center gap-3 px-3 py-3 border border-transparent text-gray-600 cursor-not-allowed">
+          <Link
+            to="/inbox"
+            className={`group flex items-center gap-3 px-3 py-3 border transition-all ${isActive('/inbox') ? 'bg-primary/10 border-primary text-primary' : 'border-transparent text-gray-400 hover:text-primary hover:border-muted'}`}
+          >
             <Terminal className="w-5 h-5" />
-            <span className="text-sm font-bold tracking-tight hidden lg:block">[ ANALYTICS ]</span>
-          </div>
+            <span className="text-sm font-bold tracking-tight hidden lg:block">[ INQUIRY_INBOX ]</span>
+          </Link>
 
           <div className="group flex items-center gap-3 px-3 py-3 border border-transparent text-gray-600 cursor-not-allowed">
             <Settings className="w-5 h-5" />

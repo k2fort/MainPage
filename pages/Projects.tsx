@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useProjectContext } from '../context/ProjectContext';
 
 export const Projects: React.FC = () => {
-    const { projects, deleteProject } = useProjectContext();
+    const { projects, deleteProject, moveProject } = useProjectContext();
     const [showNukeModal, setShowNukeModal] = useState(false);
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
@@ -60,7 +60,7 @@ export const Projects: React.FC = () => {
                         <span className="font-mono text-sm text-primary uppercase">FILTER_BY:</span>
                         <div className="flex flex-wrap gap-2">
                             <button className="bg-primary text-black px-3 py-1 font-mono text-xs font-bold border border-primary hover:opacity-80">[x] ALL</button>
-                            {['WEB', 'AI', '3D_ART', 'SYSTEM'].map(f => (
+                            {['LIVE', 'TEMPLATE'].map(f => (
                                 <button key={f} className="bg-transparent text-muted px-3 py-1 font-mono text-xs font-bold border border-muted hover:border-white hover:text-white transition-colors">[ ] {f}</button>
                             ))}
                         </div>
@@ -75,33 +75,56 @@ export const Projects: React.FC = () => {
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-white text-black font-mono text-xs uppercase tracking-wider">
                                 <tr>
-                                    <th className="p-4 border-b border-muted w-20">ID</th>
+                                    <th className="p-4 border-b border-muted w-32">SYSTEM_ID</th>
                                     <th className="p-4 border-b border-muted w-24">PREVIEW</th>
-                                    <th className="p-4 border-b border-muted">DESIGNATION</th>
+                                    <th className="p-4 border-b border-muted">PROJECT_TITLE</th>
                                     <th className="p-4 border-b border-muted w-32">CATEGORY</th>
-                                    <th className="p-4 border-b border-muted w-32">STATUS</th>
+                                    <th className="p-4 border-b border-muted w-48">TAGS</th>
                                     <th className="p-4 border-b border-muted text-right w-48">OPERATIONS</th>
                                 </tr>
                             </thead>
                             <tbody className="font-mono text-sm text-text-main divide-y divide-muted">
                                 {projects.map(p => (
                                     <tr key={p.id} className="group hover:bg-[#1a1a1a] transition-colors hover:text-white">
-                                        <td className="p-4 text-muted group-hover:text-primary">{p.id}</td>
+                                        <td className="p-4 text-muted group-hover:text-primary font-mono">{p.clientId || p.id}</td>
                                         <td className="p-4">
                                             <div className="size-10 bg-muted overflow-hidden border border-muted group-hover:border-primary">
                                                 <img className="h-full w-full object-cover opacity-70 group-hover:opacity-100 grayscale group-hover:grayscale-0 transition-all" src={p.imageUrl} alt="" />
                                             </div>
                                         </td>
                                         <td className="p-4 font-display font-bold text-base tracking-tight">{p.title}</td>
-                                        <td className="p-4 text-xs text-muted group-hover:text-white">[{p.category}]</td>
                                         <td className="p-4">
-                                            <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${p.status === 'LIVE' ? 'text-primary animate-pulse' : p.status === 'OFFLINE' ? 'text-muted' : 'text-accent'}`}>
-                                                <span className={`size-1.5 rounded-full ${p.status === 'LIVE' ? 'bg-primary' : p.status === 'OFFLINE' ? 'bg-muted' : 'bg-accent'}`}></span>
-                                                {p.status}
+                                            <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${p.category === 'LIVE' ? 'text-primary' : 'text-gray-400'}`}>
+                                                <span className={`size-1.5 rounded-full ${p.category === 'LIVE' ? 'bg-primary animate-pulse' : 'bg-gray-500'}`}></span>
+                                                {p.category}
                                             </span>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex gap-1 flex-wrap">
+                                                {p.techStack.slice(0, 3).map(tag => (
+                                                    <span key={tag} className="text-[10px] border border-muted px-1 text-muted group-hover:border-white group-hover:text-white">{tag}</span>
+                                                ))}
+                                                {p.techStack.length > 3 && <span className="text-[10px] text-muted">+{p.techStack.length - 3}</span>}
+                                            </div>
                                         </td>
                                         <td className="p-4 text-right">
                                             <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex flex-col gap-0.5 mr-2">
+                                                    <button
+                                                        onClick={() => moveProject(p.id, 'up')}
+                                                        disabled={projects.indexOf(p) === 0}
+                                                        className="p-1 hover:text-primary disabled:opacity-20 disabled:hover:text-current transition-colors leading-[0]"
+                                                    >
+                                                        ▲
+                                                    </button>
+                                                    <button
+                                                        onClick={() => moveProject(p.id, 'down')}
+                                                        disabled={projects.indexOf(p) === projects.length - 1}
+                                                        className="p-1 hover:text-primary disabled:opacity-20 disabled:hover:text-current transition-colors leading-[0]"
+                                                    >
+                                                        ▼
+                                                    </button>
+                                                </div>
                                                 <Link to={`/editor/${p.id}`}>
                                                     <button className="text-primary hover:bg-primary hover:text-black px-2 py-1 text-xs border border-primary transition-colors uppercase">[EDIT]</button>
                                                 </Link>

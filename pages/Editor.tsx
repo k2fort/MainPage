@@ -11,10 +11,10 @@ export const Editor: React.FC = () => {
     const { addProject, updateProject, getProject } = useProjectContext();
 
     const [techStack, setTechStack] = useState<string[]>(['REACT', 'THREE.JS']);
+    const [customTag, setCustomTag] = useState('');
     const [formData, setFormData] = useState<Partial<Project>>({
         title: 'NEW_PROJECT',
-        category: 'WEB',
-        status: 'DRAFT',
+        category: 'LIVE',
         description: '',
         imageUrl: '',
         clientId: 'AUTO_GEN_ID',
@@ -27,8 +27,7 @@ export const Editor: React.FC = () => {
             if (existing) {
                 setFormData({
                     title: existing.title || '',
-                    category: existing.category || 'WEB',
-                    status: existing.status || 'DRAFT',
+                    category: existing.category || 'LIVE',
                     description: existing.description || '',
                     imageUrl: existing.imageUrl || '',
                     clientId: existing.clientId || '',
@@ -71,6 +70,13 @@ export const Editor: React.FC = () => {
         navigate('/projects');
     };
 
+    const addTag = () => {
+        if (customTag && !techStack.includes(customTag.toUpperCase())) {
+            setTechStack(prev => [...prev, customTag.toUpperCase()]);
+            setCustomTag('');
+        }
+    };
+
     return (
         <div className="bg-background-dark text-text-main font-mono overflow-hidden h-full w-full relative selection:bg-primary selection:text-black">
             {/* Background Layers */}
@@ -98,21 +104,7 @@ export const Editor: React.FC = () => {
 
                     {/* Content */}
                     <div className="flex-1 overflow-y-auto p-8 space-y-10 relative z-10">
-                        {/* Meta Info */}
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="flex flex-col gap-2">
-                                <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">SYSTEM_ID</label>
-                                <div className="font-mono text-text-main border-b border-muted py-2 bg-transparent opacity-50 cursor-not-allowed">
-                                    #{id || 'AUTO_GEN'}
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">TIMESTAMP</label>
-                                <div className="font-mono text-text-main border-b border-muted py-2 bg-transparent opacity-50">
-                                    {new Date().toISOString()}
-                                </div>
-                            </div>
-                        </div>
+
 
                         {/* Title */}
                         <div className="flex flex-col gap-3 group">
@@ -139,45 +131,18 @@ export const Editor: React.FC = () => {
                                     value={formData.category}
                                     onChange={e => setFormData({ ...formData, category: e.target.value as any })}
                                 >
-                                    <option value="WEB">WEB_DEV</option>
-                                    <option value="AI">AI_MODEL</option>
-                                    <option value="3D_ART">3D_ART</option>
-                                    <option value="SYSTEM">SYSTEM</option>
-                                </select>
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">STATUS</label>
-                                <select
-                                    className="w-full bg-[#0A0A0A] border border-muted text-base p-3 text-text-main focus:border-primary focus:outline-none placeholder-muted/50 font-mono transition-colors"
-                                    value={formData.status}
-                                    onChange={e => setFormData({ ...formData, status: e.target.value as any })}
-                                >
                                     <option value="LIVE">LIVE</option>
-                                    <option value="OFFLINE">OFFLINE</option>
-                                    <option value="DRAFT">DRAFT</option>
-                                    <option value="ARCHIVED">ARCHIVED</option>
+                                    <option value="TEMPLATE">TEMPLATE</option>
                                 </select>
                             </div>
-                        </div>
-
-                        {/* Client Role */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="flex flex-col gap-3">
-                                <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">CLIENT_ID</label>
+                                <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">SYSTEM_ID (CUSTOM)</label>
                                 <input
-                                    className="w-full bg-transparent border-b border-muted text-base py-3 px-0 text-text-main focus:border-primary focus:outline-none placeholder-muted/50 font-mono transition-colors focus:bg-[#0A0A0A] focus:px-4"
+                                    className="w-full bg-[#0A0A0A] border border-muted text-base p-3 text-text-main focus:border-primary focus:outline-none placeholder-muted/50 font-mono transition-colors"
                                     type="text"
                                     value={formData.clientId}
                                     onChange={e => setFormData({ ...formData, clientId: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">ROLE_KEY</label>
-                                <input
-                                    className="w-full bg-transparent border-b border-muted text-base py-3 px-0 text-text-main focus:border-primary focus:outline-none placeholder-muted/50 font-mono transition-colors focus:bg-[#0A0A0A] focus:px-4"
-                                    type="text"
-                                    value={formData.role}
-                                    onChange={e => setFormData({ ...formData, role: e.target.value })}
+                                    placeholder="ENTER_CUSTOM_ID"
                                 />
                             </div>
                         </div>
@@ -193,11 +158,13 @@ export const Editor: React.FC = () => {
                             ></textarea>
                         </div>
 
-                        {/* Tech Stack */}
+                        {/* Tech Stack / Tags */}
                         <div className="flex flex-col gap-4">
-                            <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">TECH_STACK_INJECTION</label>
+                            <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">TAGS_INJECTION</label>
+
+                            {/* Predefined */}
                             <div className="flex flex-wrap gap-3">
-                                {['REACT', 'THREE.JS', 'WEBGL', 'PYTHON', 'DOCKER'].map(tech => (
+                                {['REACT', 'JS', 'PYTHON', 'DOCKER'].map(tech => (
                                     <button
                                         key={tech}
                                         onClick={() => setTechStack(prev => prev.includes(tech) ? prev.filter(t => t !== tech) : [...prev, tech])}
@@ -212,75 +179,55 @@ export const Editor: React.FC = () => {
                                     </button>
                                 ))}
                             </div>
+
+                            {/* Custom Tag Input */}
+                            <div className="flex gap-2 mt-2">
+                                <input
+                                    type="text"
+                                    className="flex-1 bg-transparent border-b border-muted py-2 text-white font-mono focus:border-primary focus:outline-none uppercase"
+                                    placeholder="ADD_CUSTOM_TAG..."
+                                    value={customTag}
+                                    onChange={(e) => setCustomTag(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && addTag()}
+                                />
+                                <button
+                                    onClick={addTag}
+                                    className="text-primary hover:text-white font-bold uppercase text-sm border border-primary hover:bg-primary/20 px-4 transition-colors"
+                                >
+                                    [ADD]
+                                </button>
+                            </div>
+
+                            {/* Active Tags Display */}
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {techStack.map(tag => (
+                                    <div key={tag} className="bg-muted/20 border border-muted px-2 py-1 text-xs text-primary flex items-center gap-2">
+                                        {tag}
+                                        <button onClick={() => setTechStack(prev => prev.filter(t => t !== tag))} className="text-gray-500 hover:text-white">x</button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
-                        {/* Image Upload */}
+                        {/* Image URL Input */}
                         <div className="flex flex-col gap-3 pb-8">
-                            <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">VISUAL_ASSETS</label>
-                            <div
-                                onClick={() => document.getElementById('image-upload')?.click()}
-                                className="relative w-full border-2 border-dashed border-muted hover:border-primary hover:bg-primary/5 transition-all h-64 flex flex-col items-center justify-center cursor-pointer group overflow-hidden"
-                            >
+                            <label className="font-display text-sm font-bold text-muted uppercase tracking-wider">VISUAL_ASSETS (URL)</label>
+                            <div className="flex flex-col gap-4">
                                 <input
-                                    id="image-upload"
-                                    type="file"
-                                    className="hidden"
-                                    accept="image/*"
-                                    onChange={async (e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                            // Demo Mode Check
-                                            if (!supabase) {
-                                                alert('DEMO_MODE: Cannot upload images without Supabase connection. Please configure environment variables.');
-                                                return;
-                                            }
-
-                                            try {
-                                                const fileExt = file.name.split('.').pop();
-                                                const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-                                                const filePath = `${fileName}`;
-
-                                                const { error: uploadError } = await supabase.storage
-                                                    .from('project-images')
-                                                    .upload(filePath, file);
-
-                                                if (uploadError) {
-                                                    throw uploadError;
-                                                }
-
-                                                const { data: { publicUrl } } = supabase.storage
-                                                    .from('project-images')
-                                                    .getPublicUrl(filePath);
-
-                                                setFormData(prev => ({ ...prev, imageUrl: publicUrl }));
-
-                                            } catch (error: any) {
-                                                console.error('Upload error:', error);
-                                                alert(`UPLOAD_FAILED: ${error.message || 'Unknown error'}`);
-                                            }
-                                        }
-                                    }}
+                                    className="w-full bg-[#0A0A0A] border border-muted text-base p-4 text-text-main focus:border-primary focus:outline-none placeholder-muted/50 font-mono transition-colors"
+                                    type="text"
+                                    placeholder="HTTPS://..."
+                                    value={formData.imageUrl}
+                                    onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
                                 />
 
-                                {formData.imageUrl ? (
-                                    <div className="absolute inset-0 w-full h-full">
+                                {formData.imageUrl && (
+                                    <div className="relative w-full h-64 border border-muted overflow-hidden group">
                                         <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <p className="font-mono text-white font-bold uppercase tracking-widest">[ REPLACE_ASSET ]</p>
-                                        </div>
+                                        <div className="absolute inset-0 pointer-events-none border border-primary/20 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 text-xs text-primary font-mono">PREVIEW_MODE</div>
                                     </div>
-                                ) : (
-                                    <>
-                                        <Upload className="text-4xl text-muted group-hover:text-primary mb-2" />
-                                        <p className="font-mono text-sm text-muted group-hover:text-primary uppercase tracking-widest">[!] DROP_ASSETS_HERE</p>
-                                        <p className="font-mono text-xs text-muted mt-2 opacity-50">OR CLICK_TO_INJECT</p>
-                                    </>
                                 )}
-                                {/* Decorative corners */}
-                                <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-muted group-hover:border-primary transition-colors"></div>
-                                <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-muted group-hover:border-primary transition-colors"></div>
-                                <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-muted group-hover:border-primary transition-colors"></div>
-                                <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-muted group-hover:border-primary transition-colors"></div>
                             </div>
                         </div>
                     </div>
