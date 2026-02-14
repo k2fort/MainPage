@@ -343,9 +343,9 @@ export const Landing: React.FC = () => {
                         <span>All Systems Nominal</span>
                     </div>
                     <div className="flex gap-4">
-                        <a href="#" className="hover:text-primary transition-colors">Github</a>
+                        <a href="#" className="hover:text-primary transition-colors">Instagram</a>
                         <a href="#" className="hover:text-primary transition-colors">Twitter</a>
-                        <a href="#" className="hover:text-primary transition-colors">LinkedIn</a>
+                        <a href="#" className="hover:text-primary transition-colors">Telegram</a>
                     </div>
                     <div>
                         © 2024 NEURAL_FRAGMENT // V.2.0.4
