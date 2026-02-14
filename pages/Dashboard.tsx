@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AreaChart, Area, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
-import { Eye, Clock, Cpu, Shield, Globe, Terminal as TerminalIcon } from 'lucide-react';
+import { Eye, Clock, Cpu, Shield, Globe, Terminal as TerminalIcon, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useProjectContext } from '../context/ProjectContext';
 
-const data = [
+const demoChartData = [
     { name: 'A', value: 400 },
     { name: 'B', value: 300 },
     { name: 'C', value: 200 },
@@ -22,7 +23,7 @@ const barData = [
 
 const StatCard: React.FC<{
     label: string;
-    value: string;
+    value: string | number;
     sub: string;
     icon: React.ReactNode;
     trend?: 'up' | 'down' | 'neutral';
@@ -48,10 +49,24 @@ const StatCard: React.FC<{
     </div>
 );
 
-import { useProjectContext } from '../context/ProjectContext';
-
 export const Dashboard: React.FC = () => {
     const { projects } = useProjectContext();
+
+    const stats = useMemo(() => {
+        const total = projects.length;
+        const live = projects.filter(p => p.status === 'LIVE').length;
+        const categories = new Set(projects.map(p => p.category)).size;
+
+        // Calculate "uptime" or similar metric based on recent activity if desired, 
+        // for now we'll stick to static helpful text or simple math
+        return {
+            total,
+            live,
+            categories,
+            offline: total - live
+        };
+    }, [projects]);
+
     return (
         <div className="p-6 lg:p-10 max-w-[1600px] mx-auto flex flex-col gap-8">
 
@@ -68,28 +83,23 @@ export const Dashboard: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="hidden md:flex flex-col items-end text-xs font-mono text-gray-400">
-                        <span>SERVER_TIME: 14:02:44 UTC</span>
+                        <span>SERVER_TIME: {new Date().toLocaleTimeString('en-US', { hour12: false })} UTC</span>
                         <span>LOC: 34.0522° N, 118.2437° W</span>
                     </div>
-                    <Link to="/editor">
-                        <button className="bg-primary text-black h-12 px-6 font-display font-bold uppercase tracking-wide hover:translate-x-1 hover:-translate-y-1 hover:shadow-hard transition-all duration-75 border border-primary text-sm">
-                            + INJECT_NEW_DATA
-                        </button>
-                    </Link>
                 </div>
             </header>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard label="Total_Visits" value="8,432" sub="▲ 12.5% INCREMENT" icon={<Eye className="text-primary" />}>
+                <StatCard label="Total_Projects" value={stats.total} sub="▲ 12.5% INCREMENT" icon={<TerminalIcon className="text-primary" />}>
                     <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={data}>
+                        <AreaChart data={demoChartData}>
                             <Area type="monotone" dataKey="value" stroke="#00FFFF" fill="none" strokeWidth={2} />
                         </AreaChart>
                     </ResponsiveContainer>
                 </StatCard>
 
-                <StatCard label="System_Uptime" value="99.9%" sub="LAST_BOOT: 42D AGO" icon={<Clock className="text-primary" />}>
+                <StatCard label="Live_Deployments" value={stats.live} sub="SYSTEM_OPTIMAL" icon={<Globe className="text-primary" />}>
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={barData.slice(0, 5)}>
                             <Bar dataKey="value" fill="#444" />
@@ -97,7 +107,7 @@ export const Dashboard: React.FC = () => {
                     </ResponsiveContainer>
                 </StatCard>
 
-                <StatCard label="Memory_Alloc" value="64%" sub="! HIGH_LOAD_WARN" icon={<Cpu className="text-primary" />} color="#FF003C">
+                <StatCard label="Active_Categories" value={stats.categories} sub="DIVERSE_STACK" icon={<Cpu className="text-primary" />} color="#FF003C">
                     <div className="flex gap-1 h-full items-end">
                         {[40, 60, 30, 80, 50].map((h, i) => (
                             <div key={i} style={{ height: `${h}%` }} className="w-2 bg-primary/80"></div>
@@ -105,7 +115,7 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </StatCard>
 
-                <StatCard label="Threat_Level" value="0" sub="FIREWALL_ACTIVE" icon={<Shield className="text-primary" />}>
+                <StatCard label="Security_Status" value="SECURE" sub="FIREWALL_ACTIVE" icon={<Shield className="text-primary" />}>
                     <Shield className="w-full h-full text-primary/20" />
                 </StatCard>
             </div>
@@ -121,9 +131,12 @@ export const Dashboard: React.FC = () => {
                                 <TerminalIcon className="w-4 h-4" />
                                 RECENT_INJECTIONS
                             </h3>
-                            <button className="px-2 py-1 bg-black text-white text-xs font-mono border border-black hover:bg-white hover:text-black hover:border-black transition-colors">
-                                [ FILTER: ALL ]
-                            </button>
+                            <div className="flex gap-2">
+                                <Link to="/editor" className="flex items-center gap-1 px-3 py-1 bg-black text-white text-xs font-mono border border-black hover:bg-primary hover:text-black hover:border-primary transition-colors">
+                                    <Plus className="w-3 h-3" />
+                                    [ NEW_PROJECT ]
+                                </Link>
+                            </div>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse font-mono text-sm">
@@ -139,7 +152,7 @@ export const Dashboard: React.FC = () => {
                                 <tbody className="text-gray-300">
                                     {projects.slice(0, 5).map((row) => (
                                         <tr key={row.id} className="border-b border-muted hover:bg-white/5 transition-colors group">
-                                            <td className="p-4 border-r border-muted text-gray-500">{row.id}</td>
+                                            <td className="p-4 border-r border-muted text-gray-500">{row.id.substring(0, 4)}...</td>
                                             <td className="p-4 border-r border-muted font-bold text-white group-hover:text-primary transition-colors">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-4 h-4 bg-muted border border-gray-600"></div>
@@ -230,14 +243,10 @@ export const Dashboard: React.FC = () => {
                             <span className="text-[10px]">[ AUTO_SCROLL: ON ]</span>
                         </div>
                         <div className="flex-1 p-4 font-mono text-xs overflow-y-auto text-gray-400 space-y-1 relative h-64">
-                            <p><span className="text-gray-600">[14:00:01]</span> INIT_SEQUENCE_START...</p>
-                            <p><span className="text-gray-600">[14:00:02]</span> LOADING_MODULES: <span className="text-primary">SUCCESS</span></p>
-                            <p><span className="text-gray-600">[14:00:05]</span> CHECKING_INTEGRITY... <span className="text-primary">100%</span></p>
-                            <p><span className="text-gray-600">[14:01:22]</span> USER_LOGIN: ADMIN_01 @ 192.168.1.1</p>
-                            <p><span className="text-gray-600">[14:02:10]</span> <span className="text-yellow-500">WARN: HIGH LATENCY DETECTED ON NODE_4</span></p>
-                            <p><span className="text-gray-600">[14:03:00]</span> CRON_JOB: DAILY_BACKUP <span className="text-primary">EXECUTED</span></p>
-                            <p><span className="text-gray-600">[14:03:15]</span> INCOMING_REQ: GET /portfolio/v2</p>
-                            <p><span className="text-gray-600">[14:03:16]</span> INCOMING_REQ: GET /portfolio/v2</p>
+                            <p><span className="text-gray-600">[{new Date().toLocaleTimeString()}]</span> INIT_SEQUENCE_START...</p>
+                            <p><span className="text-gray-600">[{new Date().toLocaleTimeString()}]</span> LOADING_MODULES: <span className="text-primary">SUCCESS</span></p>
+                            <p><span className="text-gray-600">[{new Date(Date.now() + 1000).toLocaleTimeString()}]</span> CHECKING_INTEGRITY... <span className="text-primary">100%</span></p>
+                            <p><span className="text-gray-600">[{new Date(Date.now() + 2000).toLocaleTimeString()}]</span> SYSTEM_READY</p>
                             <p className="animate-pulse text-primary mt-2">&gt;_ AWAITING_INPUT</p>
                         </div>
                     </div>
