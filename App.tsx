@@ -1,16 +1,23 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { Landing } from './pages/Landing';
-import { Dashboard } from './pages/Dashboard';
-import { Projects } from './pages/Projects';
-import { Editor } from './pages/Editor';
-import { Contact } from './pages/Contact';
-import { Login } from './pages/Login';
-import { InquiryInbox } from './pages/InquiryInbox';
+const Landing = React.lazy(() => import('./pages/Landing').then(module => ({ default: module.Landing })));
+const Dashboard = React.lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
+const Projects = React.lazy(() => import('./pages/Projects').then(module => ({ default: module.Projects })));
+const Editor = React.lazy(() => import('./pages/Editor').then(module => ({ default: module.Editor })));
+const Contact = React.lazy(() => import('./pages/Contact').then(module => ({ default: module.Contact })));
+const Login = React.lazy(() => import('./pages/Login').then(module => ({ default: module.Login })));
+const InquiryInbox = React.lazy(() => import('./pages/InquiryInbox').then(module => ({ default: module.InquiryInbox })));
+
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
 import { OverlayEffects } from './components/OverlayEffects';
 import { GlobalBackground } from './components/GlobalBackground';
+
+const LoadingFallback: React.FC = () => (
+  <div className="flex items-center justify-center h-screen bg-background-dark text-primary font-mono animate-pulse">
+    LOADING_MODULE...
+  </div>
+);
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isAuth = localStorage.getItem('sys_access') === 'true';
@@ -61,38 +68,40 @@ const App: React.FC = () => {
         <Router>
           <AnalyticsProvider>
             <Layout>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<Login />} />
+              <React.Suspense fallback={<LoadingFallback />}>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/login" element={<Login />} />
 
-                {/* Protected Routes */}
-                <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="/projects" element={
-                  <ProtectedRoute>
-                    <Projects />
-                  </ProtectedRoute>
-                } />
-                <Route path="/editor/:id" element={
-                  <ProtectedRoute>
-                    <Editor />
-                  </ProtectedRoute>
-                } />
-                <Route path="/editor" element={
-                  <ProtectedRoute>
-                    <Editor />
-                  </ProtectedRoute>
-                } />
-                <Route path="/inbox" element={
-                  <ProtectedRoute>
-                    <InquiryInbox />
-                  </ProtectedRoute>
-                } />
-              </Routes>
+                  {/* Protected Routes */}
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/projects" element={
+                    <ProtectedRoute>
+                      <Projects />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/editor/:id" element={
+                    <ProtectedRoute>
+                      <Editor />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/editor" element={
+                    <ProtectedRoute>
+                      <Editor />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/inbox" element={
+                    <ProtectedRoute>
+                      <InquiryInbox />
+                    </ProtectedRoute>
+                  } />
+                </Routes>
+              </React.Suspense>
             </Layout>
           </AnalyticsProvider>
         </Router>

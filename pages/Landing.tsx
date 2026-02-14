@@ -94,7 +94,7 @@ export const Landing: React.FC = () => {
                         </Reveal>
 
                         <Reveal delay={0.2}>
-                            <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold tracking-[-0.05em] leading-[0.9] text-white uppercase mix-blend-exclusion">
+                            <h1 className="text-5xl md:text-8xl lg:text-9xl font-display font-bold tracking-[-0.05em] leading-[0.9] text-white uppercase mix-blend-exclusion">
                                 <TextReveal delay={0.1}>TONY_</TextReveal><br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600">
                                     <TextReveal delay={0.2}>SMOSH</TextReveal>

@@ -27,8 +27,9 @@ export const HeroParticles: React.FC = () => {
     let height = 0;
 
     // Configuration
-    const particleCount = 1200; // Maximum density
-    const connectionDistance = 100;
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 300 : 1200; // Reduce density on mobile
+    const connectionDistance = isMobile ? 60 : 100; // Reduce connection distance on mobile
     const mouseInteractionDistance = 200;
     const speed = 0.6;
     const primaryColor = '0, 255, 255'; // Cyan
@@ -56,7 +57,8 @@ export const HeroParticles: React.FC = () => {
 
     const initParticles = () => {
       particles = [];
-      for (let i = 0; i < particleCount; i++) {
+      const currentParticleCount = window.innerWidth < 768 ? 300 : 1200;
+      for (let i = 0; i < currentParticleCount; i++) {
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
