@@ -9,6 +9,7 @@ import { Login } from './pages/Login';
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
 import { OverlayEffects } from './components/OverlayEffects';
+import { GlobalBackground } from './components/GlobalBackground';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isAuth = localStorage.getItem('sys_access') === 'true';
@@ -21,28 +22,25 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isLogin = location.pathname === '/login';
 
   return (
-    <div className="min-h-screen flex flex-col bg-background-dark text-text-main font-mono overflow-x-hidden relative">
+    <div className="min-h-screen flex flex-col text-text-main font-mono overflow-x-hidden relative">
+      <GlobalBackground />
       <OverlayEffects />
 
       {isAdmin ? (
-        <div className="flex flex-1 h-screen overflow-hidden">
+        <div className="flex flex-1 h-screen overflow-hidden relative z-10">
           <Sidebar />
-          <main className="flex-1 overflow-auto relative">
-            {/* Admin Grid Background */}
-            <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none z-0" style={{ backgroundSize: '40px 40px' }} />
+          <main className="flex-1 overflow-auto relative bg-background-dark/80 backdrop-blur-sm">
             {children}
           </main>
         </div>
       ) : isLogin ? (
-        <main className="flex-1 relative h-screen">
+        <main className="flex-1 relative h-screen z-10">
           {children}
         </main>
       ) : (
         <>
           <Navbar />
-          <main className="flex-1 pt-20 relative">
-            {/* Public Grid Background */}
-            <div className="fixed inset-0 z-0 bg-grid-pattern opacity-10 pointer-events-none" style={{ backgroundSize: '40px 40px' }} />
+          <main className="flex-1 pt-20 relative z-10">
             {children}
           </main>
         </>

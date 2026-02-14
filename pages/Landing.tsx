@@ -3,6 +3,10 @@ import { ArrowUpRight, Activity, Terminal, MapPin, Cpu, Layers, Box, Zap, Code }
 import { Link } from 'react-router-dom';
 import { HeroParticles } from '../components/HeroParticles';
 import { useProjectContext } from '../context/ProjectContext';
+import { Reveal } from '../components/Reveal';
+import { TextReveal } from '../components/TextReveal';
+import { TypewriterText } from '../components/TypewriterText';
+import { ProjectCard } from '../components/ProjectCard'; // Assuming ProjectCard is now an external component
 
 const BACKGROUNDS = [
     '/img/logo01.webp',
@@ -10,41 +14,7 @@ const BACKGROUNDS = [
     '/img/logo03.webp'
 ];
 
-const ProjectCard: React.FC<{
-    id: string;
-    title: string;
-    desc: string;
-    tags: string[];
-    img: string;
-    delay: number;
-}> = ({ id, title, desc, tags, img }) => (
-    <div className="group brutal-card bg-surface border border-muted p-0 transition-all duration-75 ease-out cursor-pointer flex flex-col hover:border-primary hover:shadow-hard hover:-translate-y-1">
-        <div className="relative aspect-video overflow-hidden border-b border-muted">
-            <img
-                src={img}
-                alt={title}
-                className="w-full h-full object-cover filter grayscale transition-all duration-300 group-hover:grayscale-0 group-hover:scale-105"
-            />
-            <div className="absolute top-2 left-2 bg-black/80 px-2 py-1 text-[10px] text-primary border border-primary/30 font-mono">
-                {id}
-            </div>
-        </div>
-        <div className="p-6 flex flex-col gap-4 flex-grow">
-            <div className="flex justify-between items-start">
-                <h3 className="text-xl md:text-2xl font-display font-bold text-white group-hover:text-primary uppercase">{title}</h3>
-                <ArrowUpRight className="text-gray-600 group-hover:text-primary transition-colors w-6 h-6" />
-            </div>
-            <p className="text-gray-400 text-sm font-mono leading-relaxed line-clamp-2">
-                {desc}
-            </p>
-            <div className="mt-auto pt-4 border-t border-muted flex flex-wrap gap-2 text-[10px] text-primary uppercase font-mono">
-                {tags.map(tag => (
-                    <span key={tag} className="bg-primary/10 px-2 py-1">{tag}</span>
-                ))}
-            </div>
-        </div>
-    </div>
-);
+// ProjectCard component definition removed as it's now imported from '../components/ProjectCard'
 
 const ServiceCard: React.FC<{
     icon: React.ReactNode;
@@ -85,27 +55,8 @@ const ServiceCard: React.FC<{
 
 export const Landing: React.FC = () => {
     const { projects } = useProjectContext();
-    const [bgImage, setBgImage] = useState<string>('');
-
-    useEffect(() => {
-        const randomBg = BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)];
-        setBgImage(randomBg);
-    }, []);
-
     return (
         <>
-            {/* Random Background Video Layer */}
-            {bgImage && (
-                <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                    <img
-                        src={bgImage}
-                        alt="Background Animation"
-                        className="w-full h-full object-cover opacity-40 scale-125 translate-x-24"
-                    />
-                    <div className="absolute inset-0 bg-background-dark/60"></div>
-                </div>
-            )}
-
             {/* Hero Section */}
             {/* Hero Section */}
             <section className="relative z-10 min-h-[85vh] flex flex-col justify-center overflow-hidden">
@@ -121,31 +72,44 @@ export const Landing: React.FC = () => {
                     </div>
 
                     <div className="relative max-w-5xl z-10">
-                        <p className="text-primary text-sm md:text-base mb-2 font-mono tracking-widest pl-1">
+                        <Reveal>
+                            <p className="text-primary text-sm md:text-base mb-2 font-mono tracking-widest pl-1">
                     // IDENTITY_RECONSTRUCTION_COMPLETE
-                        </p>
-                        <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold tracking-[-0.05em] leading-[0.9] text-white uppercase mix-blend-exclusion">
-                            TONY_<br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600">SMOSH</span>
-                        </h1>
+                            </p>
+                        </Reveal>
+
+                        <Reveal delay={0.2}>
+                            <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold tracking-[-0.05em] leading-[0.9] text-white uppercase mix-blend-exclusion">
+                                <TextReveal delay={0.1}>TONY_</TextReveal><br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600">
+                                    <TextReveal delay={0.2}>SMOSH</TextReveal>
+                                </span>
+                            </h1>
+                        </Reveal>
 
                         <div className="mt-8 flex flex-col md:flex-row gap-6 md:gap-12 items-start md:items-center">
-                            <div className="flex items-center gap-3 bg-surface border border-muted px-4 py-2">
-                                <span className="w-2 h-2 bg-primary animate-blink"></span>
-                                <span className="text-sm text-gray-400 font-mono">STATUS: <span className="text-white">OPERATIONAL</span></span>
-                            </div>
-                            <p className="max-w-md text-gray-400 text-sm md:text-base leading-relaxed font-mono">
-                                Helping founders launch faster, convert better, and automate smarter through premium web design and custom AI workflows.
-                            </p>
+                            <Reveal delay={0.8} direction="right">
+                                <div className="flex items-center gap-3 bg-surface border border-muted px-4 py-2">
+                                    <span className="w-2 h-2 bg-primary animate-blink"></span>
+                                    <span className="text-sm text-gray-400 font-mono">STATUS: <span className="text-white">OPERATIONAL</span></span>
+                                </div>
+                            </Reveal>
+                            <Reveal delay={0.9} direction="left">
+                                <p className="max-w-md text-gray-400 text-sm md:text-base leading-relaxed font-mono">
+                                    Helping founders launch faster, convert better, and automate smarter through premium web design and custom AI workflows.
+                                </p>
+                            </Reveal>
                         </div>
 
                         <div className="mt-12 group">
-                            <button
-                                onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="relative bg-transparent border border-primary text-primary hover:bg-primary hover:text-black px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wider transition-all duration-75 shadow-[4px_4px_0px_0px_#444] hover:shadow-hard"
-                            >
-                                [ Execute_Scroll_Down ]
-                            </button>
+                            <Reveal delay={1.0} direction="up">
+                                <button
+                                    onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+                                    className="relative bg-transparent border border-primary text-primary hover:bg-primary hover:text-black px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wider transition-all duration-75 shadow-[4px_4px_0px_0px_#444] hover:shadow-hard"
+                                >
+                                    [ Execute_Scroll_Down ]
+                                </button>
+                            </Reveal>
                         </div>
                     </div>
                 </div>
@@ -180,14 +144,16 @@ export const Landing: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                     {projects.map((p, i) => (
                         <div key={p.id} className={i % 2 !== 0 ? "md:mt-12" : ""}>
-                            <ProjectCard
-                                id={`ID_${p.id}`}
-                                title={p.title}
-                                desc={p.description}
-                                tags={p.techStack}
-                                img={p.imageUrl}
-                                delay={i * 0.1}
-                            />
+                            <Reveal delay={i * 0.1}>
+                                <ProjectCard
+                                    id={`ID_${p.id}`}
+                                    title={p.title}
+                                    desc={p.description}
+                                    tags={p.techStack}
+                                    img={p.imageUrl}
+                                    delay={i * 0.1}
+                                />
+                            </Reveal>
                         </div>
                     ))}
                 </div>
@@ -213,30 +179,38 @@ export const Landing: React.FC = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <ServiceCard
-                                icon={<Cpu className="w-6 h-6" />}
-                                title="Visual Identity & Design"
-                                desc="Comprehensive branding solutions including logo design, visual systems, and brand guidelines."
-                                features={['SPA_DEVELOPMENT', 'API_DESIGN', 'DB_MANAGEMENT', 'CLOUD_DEPLOY']}
-                            />
-                            <ServiceCard
-                                icon={<Layers className="w-6 h-6" />}
-                                title="Websites & Stores"
-                                desc="High-performance websites and e-commerce stores designed for optimal user experience and conversion."
-                                features={['FIGMA_PROTOTYPE', 'DESIGN_SYSTEMS', 'WIREFRAMING', 'USER_FLOWS']}
-                            />
-                            <ServiceCard
-                                icon={<Box className="w-6 h-6" />}
-                                title="WEB_GL"
-                                desc="Immersive 3D experiences directly in the browser. Using shaders and particle systems to visualize complex data."
-                                features={['THREE.JS', 'R3F', 'GLSL_SHADERS', 'PERFORMANCE']}
-                            />
-                            <ServiceCard
-                                icon={<Zap className="w-6 h-6" />}
-                                title="SEO Optimization"
-                                desc="System analysis and performance tuning. Reducing bundle sizes and improving Core Web Vitals for maximum speed."
-                                features={['AUDITING', 'SEO_BOOST', 'REFACTORING', 'ANALYTICS']}
-                            />
+                            <Reveal delay={0.1}>
+                                <ServiceCard
+                                    icon={<Cpu className="w-6 h-6" />}
+                                    title="Visual Identity & Design"
+                                    desc="Comprehensive branding solutions including logo design, visual systems, and brand guidelines."
+                                    features={['SPA_DEVELOPMENT', 'API_DESIGN', 'DB_MANAGEMENT', 'CLOUD_DEPLOY']}
+                                />
+                            </Reveal>
+                            <Reveal delay={0.2}>
+                                <ServiceCard
+                                    icon={<Layers className="w-6 h-6" />}
+                                    title="Websites & Stores"
+                                    desc="High-performance websites and e-commerce stores designed for optimal user experience and conversion."
+                                    features={['FIGMA_PROTOTYPE', 'DESIGN_SYSTEMS', 'WIREFRAMING', 'USER_FLOWS']}
+                                />
+                            </Reveal>
+                            <Reveal delay={0.3}>
+                                <ServiceCard
+                                    icon={<Box className="w-6 h-6" />}
+                                    title="WEB_GL"
+                                    desc="Immersive 3D experiences directly in the browser. Using shaders and particle systems to visualize complex data."
+                                    features={['THREE.JS', 'R3F', 'GLSL_SHADERS', 'PERFORMANCE']}
+                                />
+                            </Reveal>
+                            <Reveal delay={0.4}>
+                                <ServiceCard
+                                    icon={<Zap className="w-6 h-6" />}
+                                    title="SEO Optimization"
+                                    desc="System analysis and performance tuning. Reducing bundle sizes and improving Core Web Vitals for maximum speed."
+                                    features={['AUDITING', 'SEO_BOOST', 'REFACTORING', 'ANALYTICS']}
+                                />
+                            </Reveal>
                         </div>
                     </div>
                 </div>
@@ -249,12 +223,16 @@ export const Landing: React.FC = () => {
                         {/* Header */}
                         <div className="flex flex-wrap justify-between gap-6 items-end border-l-4 border-primary pl-6">
                             <div className="flex flex-col gap-2">
-                                <h2 className="text-5xl md:text-7xl font-bold leading-[0.9] tracking-[-0.05em] uppercase font-display text-white">
-                            // Initiate_<br />Handshake
-                                </h2>
-                                <p className="text-primary font-mono text-sm md:text-base tracking-widest mt-2">
-                                    &gt; OPENING_SECURE_CHANNEL... [LISTENING]
-                                </p>
+                                <Reveal>
+                                    <h2 className="text-5xl md:text-7xl font-bold leading-[0.9] tracking-[-0.05em] uppercase font-display text-white">
+                                // Initiate_<br />Handshake
+                                    </h2>
+                                </Reveal>
+                                <Reveal delay={0.2}>
+                                    <p className="text-primary font-mono text-sm md:text-base tracking-widest mt-2">
+                                        &gt; OPENING_SECURE_CHANNEL... [LISTENING]
+                                    </p>
+                                </Reveal>
                             </div>
 
                             <div className="hidden md:flex flex-col items-end gap-1 font-mono text-xs text-muted">
@@ -281,53 +259,57 @@ export const Landing: React.FC = () => {
                                     e.preventDefault();
                                     alert('// TRANSMISSION_INITIATED\n// PACKET_SENT_TO_HOST');
                                 }}>
-                                    <div className="flex flex-col gap-2 relative group/input">
-                                        <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
-                                            <span>01_SENDER_IDENTITY</span>
-                                            <span className="opacity-0 group-focus-within/input:opacity-100 transition-opacity">[REQUIRED]</span>
-                                        </label>
-                                        <div className="relative">
+                                    <Reveal delay={0.1} width="100%">
+                                        <div className="flex flex-col gap-2 relative group/input">
+                                            <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
+                                                <span>01_SENDER_IDENTITY</span>
+                                                <span className="text-muted group-focus-within/input:text-primary transition-colors">::</span>
+                                            </label>
                                             <input
-                                                className="w-full bg-transparent border-b border-muted text-xl md:text-2xl text-white font-mono py-4 px-0 focus:border-primary focus:outline-none placeholder-[#333] transition-colors duration-0"
-                                                placeholder="unknown_user"
+                                                className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase"
+                                                placeholder="ENTER_NAME"
                                                 type="text"
                                             />
                                         </div>
-                                    </div>
+                                    </Reveal>
 
-                                    <div className="flex flex-col gap-2 relative">
-                                        <label className="font-mono text-xs text-primary uppercase tracking-widest">02_RETURN_ADDRESS</label>
-                                        <input
-                                            className="w-full bg-transparent border-b border-muted text-xl md:text-2xl text-white font-mono py-4 px-0 focus:border-primary focus:outline-none placeholder-[#333] transition-colors duration-0"
-                                            placeholder="user@domain.loc"
-                                            type="email"
-                                        />
-                                    </div>
-
-                                    <div className="flex flex-col gap-2 relative">
-                                        <label className="font-mono text-xs text-primary uppercase tracking-widest">03_DATA_PACKET</label>
-                                        <textarea
-                                            className="w-full bg-transparent border-b border-muted text-xl md:text-2xl text-white font-mono py-4 px-0 focus:border-primary focus:outline-none placeholder-[#333] resize-none transition-colors duration-0"
-                                            placeholder="Insert message stream..."
-                                            rows={4}
-                                        ></textarea>
-                                    </div>
-
-                                    <div className="flex flex-col md:flex-row gap-6 items-center pt-6">
-                                        <button
-                                            type="submit"
-                                            className="group relative w-full md:w-auto bg-primary hover:bg-white text-black font-bold font-display uppercase text-lg px-8 py-4 tracking-wider transition-all duration-75 shadow-hard hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
-                                        >
-                                            <span className="flex items-center gap-3">
-                                                <Terminal className="w-6 h-6" />
-                                                [ EXECUTE_TRANSMISSION ]
-                                            </span>
-                                        </button>
-                                        <div className="font-mono text-xs text-muted flex gap-4">
-                                            <span>ENCRYPTION: <span className="text-accent">NONE</span></span>
-                                            <span>// PORT: 443</span>
+                                    <Reveal delay={0.2} width="100%">
+                                        <div className="flex flex-col gap-2 relative group/input">
+                                            <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
+                                                <span>02_RETURN_ADDRESS</span>
+                                                <span className="text-muted group-focus-within/input:text-primary transition-colors">::</span>
+                                            </label>
+                                            <input
+                                                className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase"
+                                                placeholder="ENTER_EMAIL"
+                                                type="email"
+                                            />
                                         </div>
-                                    </div>
+                                    </Reveal>
+
+                                    <Reveal delay={0.3} width="100%">
+                                        <div className="flex flex-col gap-2 relative group/input">
+                                            <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
+                                                <span>03_MISSION_BRIEF</span>
+                                                <span className="text-muted group-focus-within/input:text-primary transition-colors">::</span>
+                                            </label>
+                                            <textarea
+                                                className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase resize-none h-32"
+                                                placeholder="DESCRIBE_OBJECTIVE"
+                                            ></textarea>
+                                        </div>
+                                    </Reveal>
+
+                                    <Reveal delay={0.4} width="100%">
+                                        <div className="pt-8">
+                                            <button className="bg-primary text-black font-bold font-display uppercase text-xl py-4 px-12 tracking-wider transition-all duration-75 shadow-[4px_4px_0px_0px_#fff] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none flex items-center gap-2 group/btn">
+                                                [ INIT_TRANSMISSION ]
+                                                <span className="group-hover/btn:animate-ping w-2 h-2 bg-black rounded-full"></span>
+                                            </button>
+                                        </div>
+                                    </Reveal>
+
+
                                 </form>
                             </div>
 
@@ -349,14 +331,19 @@ export const Landing: React.FC = () => {
                                 <div className="bg-surface border border-muted p-4 font-mono text-xs md:text-sm h-64 overflow-y-auto relative">
                                     <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
                                     <div className="flex flex-col gap-1 text-[#888]">
-                                        <p>&gt; SYSTEM_READY</p>
-                                        <p>&gt; MOUNTING_DRIVE... [OK]</p>
-                                        <p>&gt; SCANNING_PORTS... [OK]</p>
-                                        <p className="text-primary">&gt; WAITING_FOR_INPUT<span className="animate-blink">_</span></p>
-                                        <div className="opacity-50 mt-4 flex flex-col gap-1">
-                                            <p>&gt; previous_session_id: x89_aa2</p>
-                                            <p>&gt; clearing_cache... done.</p>
-                                        </div>
+                                        <TypewriterText
+                                            lines={[
+                                                "> SYSTEM_READY",
+                                                "> MOUNTING_DRIVE... [OK]",
+                                                "> SCANNING_PORTS... [OK]",
+                                                "> WAITING_FOR_INPUT_",
+                                                "> previous_session_id: x89_aa2",
+                                                "> clearing_cache... done."
+                                            ]}
+                                            delay={1.0}
+                                            speed={30}
+                                            className="text-[#888]"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -378,7 +365,7 @@ export const Landing: React.FC = () => {
                         <a href="#" className="hover:text-primary transition-colors">Telegram</a>
                     </div>
                     <div>
-                        © 2024 NEURAL_FRAGMENT // V.2.0.4
+                        © 2025 TONYSMOSH.COM // V.1.0
                     </div>
                 </div>
             </footer>

@@ -3,6 +3,7 @@ import { AreaChart, Area, ResponsiveContainer, BarChart, Bar, Cell } from 'recha
 import { Eye, Clock, Cpu, Shield, Globe, Terminal as TerminalIcon, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProjectContext } from '../context/ProjectContext';
+import { Reveal } from '../components/Reveal';
 
 const demoChartData = [
     { name: 'A', value: 400 },
@@ -71,53 +72,63 @@ export const Dashboard: React.FC = () => {
         <div className="p-6 lg:p-10 max-w-[1600px] mx-auto flex flex-col gap-8">
 
             {/* Header */}
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-muted pb-6">
-                <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2 text-primary text-xs font-mono mb-1">
-                        <Globe className="w-3 h-3" />
-                        <span>CONNECTED :: SECURE_CHANNEL_01</span>
+            <Reveal direction="down">
+                <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-muted pb-6">
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2 text-primary text-xs font-mono mb-1">
+                            <Globe className="w-3 h-3" />
+                            <span>CONNECTED :: SECURE_CHANNEL_01</span>
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-display font-bold text-white tracking-tighter uppercase">
+                            COMMAND_CENTER<span className="text-primary animate-blink">_</span>
+                        </h2>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-display font-bold text-white tracking-tighter uppercase">
-                        COMMAND_CENTER<span className="text-primary animate-blink">_</span>
-                    </h2>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="hidden md:flex flex-col items-end text-xs font-mono text-gray-400">
-                        <span>SERVER_TIME: {new Date().toLocaleTimeString('en-US', { hour12: false })} UTC</span>
-                        <span>LOC: 34.0522° N, 118.2437° W</span>
+                    <div className="flex items-center gap-4">
+                        <div className="hidden md:flex flex-col items-end text-xs font-mono text-gray-400">
+                            <span>SERVER_TIME: {new Date().toLocaleTimeString('en-US', { hour12: false })} UTC</span>
+                            <span>LOC: 34.0522° N, 118.2437° W</span>
+                        </div>
                     </div>
-                </div>
-            </header>
+                </header>
+            </Reveal>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard label="Total_Projects" value={stats.total} sub="▲ 12.5% INCREMENT" icon={<TerminalIcon className="text-primary" />}>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={demoChartData}>
-                            <Area type="monotone" dataKey="value" stroke="#00FFFF" fill="none" strokeWidth={2} />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </StatCard>
+                <Reveal delay={0.1} width="100%">
+                    <StatCard label="Total_Projects" value={stats.total} sub="▲ 12.5% INCREMENT" icon={<TerminalIcon className="text-primary" />}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={demoChartData}>
+                                <Area type="monotone" dataKey="value" stroke="#00FFFF" fill="none" strokeWidth={2} />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </StatCard>
+                </Reveal>
 
-                <StatCard label="Live_Deployments" value={stats.live} sub="SYSTEM_OPTIMAL" icon={<Globe className="text-primary" />}>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={barData.slice(0, 5)}>
-                            <Bar dataKey="value" fill="#444" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </StatCard>
+                <Reveal delay={0.2} width="100%">
+                    <StatCard label="Live_Deployments" value={stats.live} sub="SYSTEM_OPTIMAL" icon={<Globe className="text-primary" />}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={barData.slice(0, 5)}>
+                                <Bar dataKey="value" fill="#444" />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </StatCard>
+                </Reveal>
 
-                <StatCard label="Active_Categories" value={stats.categories} sub="DIVERSE_STACK" icon={<Cpu className="text-primary" />} color="#FF003C">
-                    <div className="flex gap-1 h-full items-end">
-                        {[40, 60, 30, 80, 50].map((h, i) => (
-                            <div key={i} style={{ height: `${h}%` }} className="w-2 bg-primary/80"></div>
-                        ))}
-                    </div>
-                </StatCard>
+                <Reveal delay={0.3} width="100%">
+                    <StatCard label="Active_Categories" value={stats.categories} sub="DIVERSE_STACK" icon={<Cpu className="text-primary" />} color="#FF003C">
+                        <div className="flex gap-1 h-full items-end">
+                            {[40, 60, 30, 80, 50].map((h, i) => (
+                                <div key={i} style={{ height: `${h}%` }} className="w-2 bg-primary/80"></div>
+                            ))}
+                        </div>
+                    </StatCard>
+                </Reveal>
 
-                <StatCard label="Security_Status" value="SECURE" sub="FIREWALL_ACTIVE" icon={<Shield className="text-primary" />}>
-                    <Shield className="w-full h-full text-primary/20" />
-                </StatCard>
+                <Reveal delay={0.4} width="100%">
+                    <StatCard label="Security_Status" value="SECURE" sub="FIREWALL_ACTIVE" icon={<Shield className="text-primary" />}>
+                        <Shield className="w-full h-full text-primary/20" />
+                    </StatCard>
+                </Reveal>
             </div>
 
             {/* Main Grid */}
@@ -125,51 +136,53 @@ export const Dashboard: React.FC = () => {
 
                 {/* Left Col: Projects Table */}
                 <div className="lg:col-span-2 flex flex-col gap-6">
-                    <div className="border border-muted bg-surface flex flex-col">
-                        <div className="bg-white text-black p-3 flex justify-between items-center border-b border-muted">
-                            <h3 className="font-display font-bold uppercase tracking-tight flex items-center gap-2">
-                                <TerminalIcon className="w-4 h-4" />
-                                RECENT_INJECTIONS
-                            </h3>
-                            <div className="flex gap-2">
-                                <Link to="/editor" className="flex items-center gap-1 px-3 py-1 bg-black text-white text-xs font-mono border border-black hover:bg-primary hover:text-black hover:border-primary transition-colors">
-                                    <Plus className="w-3 h-3" />
-                                    [ NEW_PROJECT ]
-                                </Link>
+                    <Reveal delay={0.5} width="100%">
+                        <div className="border border-muted bg-surface flex flex-col">
+                            <div className="bg-white text-black p-3 flex justify-between items-center border-b border-muted">
+                                <h3 className="font-display font-bold uppercase tracking-tight flex items-center gap-2">
+                                    <TerminalIcon className="w-4 h-4" />
+                                    RECENT_INJECTIONS
+                                </h3>
+                                <div className="flex gap-2">
+                                    <Link to="/editor" className="flex items-center gap-1 px-3 py-1 bg-black text-white text-xs font-mono border border-black hover:bg-primary hover:text-black hover:border-primary transition-colors">
+                                        <Plus className="w-3 h-3" />
+                                        [ NEW_PROJECT ]
+                                    </Link>
+                                </div>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse font-mono text-sm">
+                                    <thead>
+                                        <tr className="border-b border-muted text-xs uppercase text-gray-500">
+                                            <th className="p-4 font-normal border-r border-muted w-16">ID</th>
+                                            <th className="p-4 font-normal border-r border-muted">PROJECT_ENTITY</th>
+                                            <th className="p-4 font-normal border-r border-muted w-32">PROTOCOL</th>
+                                            <th className="p-4 font-normal border-r border-muted w-24">STATUS</th>
+                                            <th className="p-4 font-normal text-right w-32">ACTIONS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="text-gray-300">
+                                        {projects.slice(0, 5).map((row) => (
+                                            <tr key={row.id} className="border-b border-muted hover:bg-white/5 transition-colors group">
+                                                <td className="p-4 border-r border-muted text-gray-500">{row.id.substring(0, 4)}...</td>
+                                                <td className="p-4 border-r border-muted font-bold text-white group-hover:text-primary transition-colors">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-4 h-4 bg-muted border border-gray-600"></div>
+                                                        {row.title}
+                                                    </div>
+                                                </td>
+                                                <td className="p-4 border-r border-muted text-xs">{row.category}</td>
+                                                <td className={`p-4 border-r border-muted font-bold text-xs ${row.status === 'LIVE' ? 'text-primary' : row.status === 'ERROR' ? 'text-accent' : 'text-yellow-500'}`}>[ {row.status} ]</td>
+                                                <td className="p-4 text-right">
+                                                    <Link to={`/editor/${row.id}`} className="text-xs underline hover:text-primary hover:no-underline mr-2">EDIT</Link>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse font-mono text-sm">
-                                <thead>
-                                    <tr className="border-b border-muted text-xs uppercase text-gray-500">
-                                        <th className="p-4 font-normal border-r border-muted w-16">ID</th>
-                                        <th className="p-4 font-normal border-r border-muted">PROJECT_ENTITY</th>
-                                        <th className="p-4 font-normal border-r border-muted w-32">PROTOCOL</th>
-                                        <th className="p-4 font-normal border-r border-muted w-24">STATUS</th>
-                                        <th className="p-4 font-normal text-right w-32">ACTIONS</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-gray-300">
-                                    {projects.slice(0, 5).map((row) => (
-                                        <tr key={row.id} className="border-b border-muted hover:bg-white/5 transition-colors group">
-                                            <td className="p-4 border-r border-muted text-gray-500">{row.id.substring(0, 4)}...</td>
-                                            <td className="p-4 border-r border-muted font-bold text-white group-hover:text-primary transition-colors">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-4 h-4 bg-muted border border-gray-600"></div>
-                                                    {row.title}
-                                                </div>
-                                            </td>
-                                            <td className="p-4 border-r border-muted text-xs">{row.category}</td>
-                                            <td className={`p-4 border-r border-muted font-bold text-xs ${row.status === 'LIVE' ? 'text-primary' : row.status === 'ERROR' ? 'text-accent' : 'text-yellow-500'}`}>[ {row.status} ]</td>
-                                            <td className="p-4 text-right">
-                                                <Link to={`/editor/${row.id}`} className="text-xs underline hover:text-primary hover:no-underline mr-2">EDIT</Link>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    </Reveal>
 
                     {/* Visual Filler Charts */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -253,6 +266,6 @@ export const Dashboard: React.FC = () => {
                 </div>
 
             </div>
-        </div>
+        </div >
     );
 };
