@@ -78,14 +78,15 @@ export const Login: React.FC = () => {
                         {/* Form */}
                         <form onSubmit={handleLogin} className="flex flex-col gap-6">
                             <div className="flex flex-col gap-2 relative group/input">
-                                <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
+                                <label htmlFor="operator_id" className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
                                     <span>OPERATOR_ID</span>
-                                    <span className="text-muted group-focus-within/input:text-primary transition-colors">::</span>
+                                    <span className="text-muted group-focus-within/input:text-primary transition-colors duration-200">::</span>
                                 </label>
                                 <div className="relative">
-                                    <Terminal className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-muted group-focus-within/input:text-primary transition-colors" />
+                                    <Terminal className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-muted group-focus-within/input:text-primary transition-colors duration-200" />
                                     <input
-                                        className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 pl-8 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors uppercase"
+                                        id="operator_id"
+                                        className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 pl-8 focus:border-primary focus:outline-none focus-visible:ring-1 focus-visible:ring-primary placeholder-muted/30 transition-colors duration-200 uppercase"
                                         placeholder="ENTER_ID"
                                         type="text"
                                         value={id}
@@ -96,14 +97,15 @@ export const Login: React.FC = () => {
                             </div>
 
                             <div className="flex flex-col gap-2 relative group/input">
-                                <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
+                                <label htmlFor="access_key" className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
                                     <span>ACCESS_KEY</span>
-                                    <span className="text-muted group-focus-within/input:text-primary transition-colors">::</span>
+                                    <span className="text-muted group-focus-within/input:text-primary transition-colors duration-200">::</span>
                                 </label>
                                 <div className="relative">
-                                    <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-muted group-focus-within/input:text-primary transition-colors" />
+                                    <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-muted group-focus-within/input:text-primary transition-colors duration-200" />
                                     <input
-                                        className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 pl-8 pr-8 focus:border-primary focus:outline-none placeholder-muted/30 transition-colors"
+                                        id="access_key"
+                                        className="w-full bg-transparent border-b border-muted text-lg text-white font-mono py-2 pl-8 pr-8 focus:border-primary focus:outline-none focus-visible:ring-1 focus-visible:ring-primary placeholder-muted/30 transition-colors duration-200"
                                         placeholder="••••••••"
                                         type={showPassword ? "text" : "password"}
                                         value={key}
@@ -112,8 +114,9 @@ export const Login: React.FC = () => {
                                     />
                                     <button
                                         type="button"
+                                        aria-label="Toggle Password Visibility"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-0 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors"
+                                        className="absolute right-0 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded"
                                     >
                                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
@@ -134,7 +137,7 @@ export const Login: React.FC = () => {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className={`w-full bg-primary text-black font-bold font-display uppercase text-lg py-4 tracking-wider transition-all duration-75 shadow-hard hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${loading ? 'animate-pulse' : ''}`}
+                                    className={`w-full bg-primary text-black font-bold font-display uppercase text-lg py-4 tracking-wider transition-all duration-200 shadow-hard hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-background-dark ${loading ? 'animate-pulse' : ''}`}
                                 >
                                     {loading ? (
                                         <>

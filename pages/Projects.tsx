@@ -89,7 +89,7 @@ export const Projects: React.FC = () => {
                                         <td className="p-4 text-muted group-hover:text-primary font-mono">{p.clientId || p.id}</td>
                                         <td className="p-4">
                                             <div className="size-10 bg-muted overflow-hidden border border-muted group-hover:border-primary">
-                                                <img className="h-full w-full object-cover opacity-70 group-hover:opacity-100 grayscale group-hover:grayscale-0 transition-all" src={p.imageUrl} alt="" />
+                                                <img className="h-full w-full object-cover opacity-70 group-hover:opacity-100 grayscale group-hover:grayscale-0 transition-all duration-300" src={p.imageUrl} alt={p.title || "Project Image preview"} />
                                             </div>
                                         </td>
                                         <td className="p-4 font-display font-bold text-base tracking-tight">{p.title}</td>

@@ -39,13 +39,14 @@ export const Contact: React.FC = () => {
 
                         <form className="flex flex-col gap-10 p-2">
                             <div className="flex flex-col gap-2 relative group/input">
-                                <label className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
+                                <label htmlFor="sender" className="font-mono text-xs text-primary uppercase tracking-widest flex justify-between">
                                     <span>01_SENDER_IDENTITY</span>
                                     <span className="opacity-0 group-focus-within/input:opacity-100 transition-opacity">[REQUIRED]</span>
                                 </label>
                                 <div className="relative">
                                     <input
-                                        className="w-full bg-transparent border-b border-muted text-xl md:text-2xl text-white font-mono py-4 px-0 focus:border-primary focus:outline-none placeholder-[#333] transition-colors duration-0"
+                                        id="sender"
+                                        className="w-full bg-transparent border-b border-muted text-xl md:text-2xl text-white font-mono py-4 px-0 focus:border-primary focus:outline-none focus-visible:ring-1 focus-visible:ring-primary placeholder-[#333] transition-colors duration-200"
                                         placeholder="unknown_user"
                                         type="text"
                                     />
@@ -53,18 +54,20 @@ export const Contact: React.FC = () => {
                             </div>
 
                             <div className="flex flex-col gap-2 relative">
-                                <label className="font-mono text-xs text-primary uppercase tracking-widest">02_RETURN_ADDRESS</label>
+                                <label htmlFor="email" className="font-mono text-xs text-primary uppercase tracking-widest">02_RETURN_ADDRESS</label>
                                 <input
-                                    className="w-full bg-transparent border-b border-muted text-xl md:text-2xl text-white font-mono py-4 px-0 focus:border-primary focus:outline-none placeholder-[#333] transition-colors duration-0"
+                                    id="email"
+                                    className="w-full bg-transparent border-b border-muted text-xl md:text-2xl text-white font-mono py-4 px-0 focus:border-primary focus:outline-none focus-visible:ring-1 focus-visible:ring-primary placeholder-[#333] transition-colors duration-200"
                                     placeholder="user@domain.loc"
                                     type="email"
                                 />
                             </div>
 
                             <div className="flex flex-col gap-2 relative">
-                                <label className="font-mono text-xs text-primary uppercase tracking-widest">03_DATA_PACKET</label>
+                                <label htmlFor="message" className="font-mono text-xs text-primary uppercase tracking-widest">03_DATA_PACKET</label>
                                 <textarea
-                                    className="w-full bg-transparent border-b border-muted text-xl md:text-2xl text-white font-mono py-4 px-0 focus:border-primary focus:outline-none placeholder-[#333] resize-none transition-colors duration-0"
+                                    id="message"
+                                    className="w-full bg-transparent border-b border-muted text-xl md:text-2xl text-white font-mono py-4 px-0 focus:border-primary focus:outline-none focus-visible:ring-1 focus-visible:ring-primary placeholder-[#333] resize-none transition-colors duration-200"
                                     placeholder="Insert message stream..."
                                     rows={4}
                                 ></textarea>
@@ -73,7 +76,7 @@ export const Contact: React.FC = () => {
                             <div className="flex flex-col md:flex-row gap-6 items-center pt-6">
                                 <button
                                     type="button"
-                                    className="group relative w-full md:w-auto bg-primary hover:bg-white text-black font-bold font-display uppercase text-lg px-8 py-4 tracking-wider transition-all duration-75 shadow-hard hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
+                                    className="group relative w-full md:w-auto bg-primary hover:bg-white text-black font-bold font-display uppercase text-lg px-8 py-4 tracking-wider transition-all duration-200 shadow-hard hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-background-dark"
                                 >
                                     <span className="flex items-center gap-3">
                                         <Terminal className="w-6 h-6" />
