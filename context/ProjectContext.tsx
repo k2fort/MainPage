@@ -121,15 +121,29 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
         if (!supabase) return;
 
-        const subscription = supabase
+        let isMounted = true;
+        let subscriptionTimeout: NodeJS.Timeout;
+
+        const channel = supabase
             .channel('public:projects')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
-                fetchProjects();
-            })
-            .subscribe();
+                if (isMounted) {
+                    fetchProjects();
+                }
+            });
+
+        // Delay the actual connect by 100ms. If React StrictMode immediately
+        // unmounts us, the timeout is cleared and we never start the websocket connection
+        subscriptionTimeout = setTimeout(() => {
+            if (isMounted) {
+                channel.subscribe();
+            }
+        }, 100);
 
         return () => {
-            supabase.removeChannel(subscription);
+            isMounted = false;
+            clearTimeout(subscriptionTimeout);
+            supabase.removeChannel(channel);
         };
     }, [supabase]); // Added supabase to dependency array
 

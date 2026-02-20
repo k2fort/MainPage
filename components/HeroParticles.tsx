@@ -28,7 +28,7 @@ export const HeroParticles: React.FC = () => {
 
     // Configuration
     const isMobile = window.innerWidth < 768;
-    const particleCount = isMobile ? 300 : 1200; // Reduce density on mobile
+    const particleCount = isMobile ? 150 : 400; // Reduce density to improve performance
     const connectionDistance = isMobile ? 60 : 100; // Reduce connection distance on mobile
     const mouseInteractionDistance = 200;
     const speed = 0.6;
@@ -57,7 +57,7 @@ export const HeroParticles: React.FC = () => {
 
     const initParticles = () => {
       particles = [];
-      const currentParticleCount = window.innerWidth < 768 ? 300 : 1200;
+      const currentParticleCount = window.innerWidth < 768 ? 150 : 400;
       for (let i = 0; i < currentParticleCount; i++) {
         particles.push({
           x: Math.random() * width,
@@ -72,6 +72,8 @@ export const HeroParticles: React.FC = () => {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
+      const connDistSq = connectionDistance * connectionDistance;
+
       particles.forEach((p, i) => {
         // Update Position
         p.x += p.vx;
@@ -84,10 +86,11 @@ export const HeroParticles: React.FC = () => {
         // Mouse Interaction
         const dxMouse = mouseRef.current.x - p.x;
         const dyMouse = mouseRef.current.y - p.y;
-        const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+        const distMouseSq = dxMouse * dxMouse + dyMouse * dyMouse;
 
-        // Repulsion effect from mouse
-        if (distMouse < mouseInteractionDistance) {
+        // Use squared distance for the initial check to save on Math.sqrt calls
+        if (distMouseSq < (mouseInteractionDistance * mouseInteractionDistance)) {
+          const distMouse = Math.sqrt(distMouseSq);
           const angle = Math.atan2(dyMouse, dxMouse);
           const force = (mouseInteractionDistance - distMouse) / mouseInteractionDistance;
 
@@ -114,9 +117,11 @@ export const HeroParticles: React.FC = () => {
           const p2 = particles[j];
           const dx = p.x - p2.x;
           const dy = p.y - p2.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          const distanceSq = dx * dx + dy * dy;
 
-          if (distance < connectionDistance) {
+          // Only calculate sqrt if within squared threshold
+          if (distanceSq < connDistSq) {
+            const distance = Math.sqrt(distanceSq);
             const opacity = 1 - distance / connectionDistance;
             ctx.beginPath();
             ctx.strokeStyle = `rgba(${primaryColor}, ${opacity * 0.15})`;

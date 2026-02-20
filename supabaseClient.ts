@@ -10,3 +10,18 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = (supabaseUrl && supabaseAnonKey)
     ? createClient(supabaseUrl, supabaseAnonKey)
     : null;
+
+// Diagnostic Check
+if (supabase) {
+    supabase.from('projects').select('count', { count: 'exact', head: true })
+        .then(({ error }) => {
+            if (error) {
+                console.error('Supabase Connection Error:', error.message);
+                if (error.message.includes('fetch')) {
+                    console.warn('Network error: Check your internet connection or if the Supabase project is paused.');
+                }
+            } else {
+                console.log('Supabase Connection: OK');
+            }
+        });
+}
