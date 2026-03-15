@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent: #f46036;
+  --color-accent2: #fa8334;
+  --color-surface: #150f10;
+  --color-card: #1c1415;
+  --color-muted: #588b8b;
+  --color-dim: #3a6060;
+  --color-subtle: #261d1e;
+  --color-white: #eaf2ef;
+  --color-black: #0d090a;
+
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  --breakpoint-3xl: 2560px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #0d090a;
+  color: #eaf2ef;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─── Custom Cursor ───────────────────────────────────── */
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: #f46036;
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+  mix-blend-mode: difference;
+}
+
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(234, 242, 239, 0.25);
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    height 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cursor-dot.hovered {
+  width: 12px;
+  height: 12px;
+}
+
+.cursor-ring.hovered {
+  width: 60px;
+  height: 60px;
+  border-color: rgba(244, 96, 54, 0.35);
+}
+
+/* ─── Hero Visual Gradient ────────────────────────────── */
+.hero-gradient-bg {
+  background: radial-gradient(
+      ellipse 65% 85% at 32% 68%,
+      rgba(244, 96, 54, 0.7),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 55% 70% at 70% 28%,
+      rgba(88, 139, 139, 0.55),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 45% 55% at 16% 16%,
+      rgba(250, 131, 52, 0.32),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 40% 50% at 84% 80%,
+      rgba(58, 96, 96, 0.4),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 30% 40% at 55% 42%,
+      rgba(234, 242, 239, 0.06),
+      transparent
+    ),
+    #0d090a;
+  animation: heroShimmer 14s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes heroShimmer {
+  0%,
+  100% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  33% {
+    filter: hue-rotate(12deg) brightness(1.08);
+  }
+  66% {
+    filter: hue-rotate(-8deg) brightness(0.96);
+  }
+}
+
+/* ─── Capability Card Gradients ───────────────────────── */
+.cap-branding {
+  background: radial-gradient(
+      ellipse 70% 80% at 40% 60%,
+      rgba(244, 96, 54, 0.65),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 50% 60% at 75% 25%,
+      rgba(250, 131, 52, 0.4),
+      transparent
+    ),
+    #120d0e;
+}
+
+.cap-product {
+  background: radial-gradient(
+      ellipse 70% 80% at 50% 55%,
+      rgba(88, 139, 139, 0.6),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 50% 60% at 20% 30%,
+      rgba(58, 96, 96, 0.4),
+      transparent
+    ),
+    #120d0e;
+}
+
+.cap-motion {
+  background: radial-gradient(
+      ellipse 70% 80% at 45% 60%,
+      rgba(244, 96, 54, 0.5),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 50% 60% at 75% 30%,
+      rgba(88, 139, 139, 0.4),
+      transparent
+    ),
+    #120d0e;
+}
+
+.cap-web {
+  background: radial-gradient(
+      ellipse 70% 80% at 40% 65%,
+      rgba(58, 96, 96, 0.55),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 50% 60% at 75% 25%,
+      rgba(234, 242, 239, 0.08),
+      transparent
+    ),
+    #120d0e;
+}
+
+/* ─── Project card image overlays ────────────────────── */
+.project-overlay {
+  background: linear-gradient(to top, rgba(13, 9, 10, 0.75) 0%, transparent 60%);
+}
+
+/* ─── Scrollbar ───────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: #0d090a;
+}
+::-webkit-scrollbar-thumb {
+  background: #261d1e;
+  border-radius: 2px;
+}
+
+/* ─── Selection ───────────────────────────────────────── */
+::selection {
+  background: #f46036;
+  color: #0d090a;
+}
